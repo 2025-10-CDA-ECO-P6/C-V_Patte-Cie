@@ -16,6 +16,10 @@ COPY . .
 # Expose le port
 EXPOSE 3000
 
+# Expose la variable d'environnement au build pour Prisma
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 # Génère Prisma client
 RUN npx prisma generate
 

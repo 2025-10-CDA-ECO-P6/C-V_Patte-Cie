@@ -1,11 +1,16 @@
 version: "3.9"
 services:
   backend:
-    build: .
-    ports:
-      - "3000:3000"
+    build:
+      context: .
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
     env_file:
       - .env
+    ports:
+      - "3000:3000"
     volumes:
       - .:/app
       - /app/node_modules
