@@ -1,1 +1,12 @@
-// user
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+export const getAllUsers = async () => {
+  return prisma.user.findMany({
+    include: {
+      owner: true,
+      veterinarian: true,
+    },
+  });
+};
