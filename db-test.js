@@ -17,6 +17,7 @@ async function main() {
       ["Dupont", "0123456789", "dupont@example.com", "1 rue de Paris", 1] // 1 = un user_id existant
     );
     const ownerId = ownerResult.rows[0].owner_id;
+    
     const animalResult = await client.query(
       `INSERT INTO animal (name, species, breed, date_of_birth, picture, weight, gender, owner_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
