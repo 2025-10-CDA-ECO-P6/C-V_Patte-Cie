@@ -1,7 +1,10 @@
-import * as animalRepository from '../repositories/animal.repository';
-import { Animal } from '@prisma/client';
+import * as animalRepo from "../repositories/animal.repository";
 
-export const getAllAnimals = async (): Promise<Animal[]> => {
-  const animals = await animalRepository.getAllAnimals();
-  return animals;
+export const fetchAllAnimals = async () => {
+  try {
+    const animals = await animalRepo.getAllAnimals();
+    return animals;
+  } catch (error) {
+    throw new Error("Error fetching animals: " + (error as Error).message);
+  }
 };
