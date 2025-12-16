@@ -10,3 +10,13 @@ export const getAllUsers = async () => {
     },
   });
 };
+
+export const getByIdUser = async (userId: number) => {
+  return prisma.user.findFirst({
+    where: { userId: userId },
+    include: {
+      owner: true,
+      veterinarian: true,
+    },
+  });
+};
