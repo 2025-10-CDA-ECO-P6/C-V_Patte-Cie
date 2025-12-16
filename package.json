@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -13,7 +16,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/2025-10-CDA-ECO-P6/C-V_Patte-Cie/issues"
   },
@@ -27,6 +29,8 @@
     "prisma": "^7.1.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }
