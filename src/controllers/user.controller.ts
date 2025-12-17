@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser } from "../services/user.service";
+import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, deleteUserById } from "../services/user.service";
 import { CreateUserDTO } from "../types/user.types";
+import { AuthRequest } from "../middlewares/auth.middleware";
 
 
 // create
@@ -91,3 +92,24 @@ export const postLogin = async (req: Request, res: Response) => {
 // update
 
 // delete
+export const deleteUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = Number.parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    await deleteUserById(userId);
+    res.status(200).json({ message: "User successfully deleted" });
+  } catch (err) {
+    console.error(err);
+    const errorMessage = (err as Error).message;
+
+    if (errorMessage.includes("User not found")) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};

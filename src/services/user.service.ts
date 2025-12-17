@@ -83,3 +83,18 @@ export const fetchByIdUser = async (userId: number) => {
 // update
 
 // delete
+export const deleteUserById = async (userId: number) => {
+  try {
+    const user = await userRepo.getByIdUser(userId);
+    
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    await userRepo.deleteUser(userId);
+    
+    return { message: "User successfully deleted" };
+  } catch (error) {
+    throw new Error("Error deleting user: " + (error as Error).message);
+  }
+};
