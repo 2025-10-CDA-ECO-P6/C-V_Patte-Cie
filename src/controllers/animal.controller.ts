@@ -43,6 +43,12 @@ export const getByIdAnimalController = async (req: Request, res: Response) => {
 
     const animal = await fetchByIdAnimal(animalId);
 
+    if (!animal) {
+    return res.status(404).json({
+      message: "Animal not found",
+    });
+    }
+
     res.status(200).json({
       data: mapAnimal(animal),
     });
