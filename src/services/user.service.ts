@@ -1,5 +1,7 @@
 import * as userRepo from "../repositories/user.repository";
 
+//
+
 export const fetchAllUsers = async () => {
   try {
     const users = await userRepo.getAllUsers();
