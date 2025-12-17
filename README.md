@@ -21,8 +21,12 @@ cd C-V_Patte-Cie
 npm install
 
 # Configurer l'environnement
-cp .env.example .env
+cp .env.sample .env
 # Éditer .env avec vos valeurs
+
+# Générer une clé secrète JWT sécurisée
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+# Copier le résultat dans .env comme valeur de JWT_SECRET
 ```
 ## Lancer le serveur
 
@@ -90,6 +94,34 @@ psql $DATABASE_URL
 npx prisma studio    # Interface graphique DB
 npm run dev          # Lancer le serveur en watch
 ```
+
+## 🔐 Configuration JWT
+
+### Générer un JWT_SECRET
+
+Pour sécuriser l'authentification, vous devez générer une clé secrète forte pour le JWT_SECRET dans votre fichier `.env`.
+
+**Méthode 1 : Node.js (recommandé)**
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+**Méthode 2 : OpenSSL**
+```bash
+openssl rand -hex 64
+```
+
+**Méthode 3 : Terminal Linux/Mac**
+```bash
+head /dev/urandom | tr -dc A-Za-z0-9 | head -c 64
+```
+
+Copiez le résultat généré et ajoutez-le dans votre fichier `.env`:
+```bash
+JWT_SECRET="votre_clé_générée_ici"
+```
+
+**Important**: Ne partagez jamais cette clé et ne la commitez jamais dans Git. Ne changez pas cette valeur en production car cela invaliderait tous les tokens existants.
 
 ## 👥 Équipe
 
