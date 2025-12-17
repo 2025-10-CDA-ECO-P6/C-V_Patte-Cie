@@ -12,4 +12,15 @@ export const getAllAnimals = async () => {
   });
 };
 
+export const getByIdAnimal = async (animalId: number) => {
+  return prisma.animal.findFirst({
+    where: { animalId: animalId },
+    include: {
+       owner: true,
+      vaccines: true,
+      visits: true,
+    },
+  });
+};
+
 export default prisma;
