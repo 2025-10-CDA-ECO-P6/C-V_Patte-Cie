@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchAllAnimals, fetchByIdAnimal, createAnimal } from "../services/animal.service";
+import { fetchAllAnimals, fetchByIdAnimal, createAnimal, AnimalInput } from "../services/animal.service";
 
 export const getAnimals = async (req: Request, res: Response) => {
   try {
@@ -22,31 +22,11 @@ export const getByIdAnimal = async (req: Request, res: Response) => {
   }
 };
 
-export const createAnimalController = async (
-  req: Request,
-  res: Response
-) => {
+export const createAnimalController = async (req: Request, res: Response) => {
   try {
-    const {
-      name,
-      species,
-      breed,
-      dateOfBirth,
-      picture,
-      weight,
-      gender,
-      ownerId,
-    } = req.body;
+    const { name, species, breed, dateOfBirth, picture, weight, gender, ownerId } = req.body;
 
-    if (
-      !name ||
-      !species ||
-      !breed ||
-      !dateOfBirth ||
-      !weight ||
-      !gender ||
-      !ownerId
-    ) {
+    if (!name || !species || !breed || !dateOfBirth || !weight || !gender || !ownerId) {
       return res.status(400).json({ message: "Champs manquants" });
     }
 
@@ -54,7 +34,7 @@ export const createAnimalController = async (
       return res.status(400).json({ message: "Genre invalide" });
     }
 
-    const animal = await createAnimal({
+    const animalData: AnimalInput = {
       name,
       species,
       breed,
@@ -63,8 +43,9 @@ export const createAnimalController = async (
       weight,
       gender,
       ownerId: Number(ownerId),
-    });
+    };
 
+    const animal = await createAnimal(animalData);
     res.status(201).json(animal);
   } catch (err) {
     console.error(err);
