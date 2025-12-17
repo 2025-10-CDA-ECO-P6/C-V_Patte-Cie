@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser } from "../services/user.service";
 import { CreateUserDTO } from "../types/user.types";
-import { generateToken } from "../utils/jwt.utils";
 
 
 // create
@@ -73,22 +72,9 @@ export const postLogin = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const user = await loginUser(email, password);
-
-    const token = generateToken({
-      userId: user.userId,
-      email: user.email,
-      userRole: user.userRole,
-    });
-
+    const token = await loginUser(email, password);
     res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        userId: user.userId,
-        email: user.email,
-        userRole: user.userRole,
-      },
+      accessToken: token
     });
   } catch (err) {
     console.error(err);

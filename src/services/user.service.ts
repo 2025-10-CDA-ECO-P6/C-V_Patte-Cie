@@ -1,6 +1,6 @@
 import * as userRepo from "../repositories/user.repository";
 import { CreateUserDTO } from "../types/user.types";
-import { Prisma } from '@prisma/client';
+import { generateToken } from "../utils/jwt.utils";
 import bcrypt from 'bcrypt';
 
 // login
@@ -18,7 +18,11 @@ export const loginUser = async (email: string, password: string) => {
       throw new Error("Invalid credentials");
     }
 
-    return user;
+    return generateToken({
+      userId: user.userId,
+      email: user.email,
+      userRole: user.userRole,
+    });
   } catch (error) {
     throw new Error("Error during login: " + (error as Error).message);
   }

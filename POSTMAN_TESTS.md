@@ -79,16 +79,10 @@ Content-Type: application/json
 - ✅ **200 OK**: Login réussi
   ```json
   {
-    "message": "Login successful",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "userId": 1,
-      "email": "owner@example.com",
-      "userRole": "owner"
-    }
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoib3duZXJAZXhhbXBsZS5jb20iLCJ1c2VyUm9sZSI6Im93bmVyIiwiaWF0IjoxNzM0NDU2Nzg5LCJleHAiOjE3MzQ1NDMxODl9..."
   }
   ```
-  ⚠️ **Important**: Sauvegarder le `token` pour les requêtes protégées
+  ⚠️ **Important**: Sauvegarder le `accessToken` pour les requêtes protégées
 
 - ❌ **400 Bad Request**: Champs manquants
   ```json

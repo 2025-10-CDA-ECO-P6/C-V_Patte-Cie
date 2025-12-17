@@ -9,11 +9,7 @@ export const createUser = async (userData: {
   createdAt: Date;
 }) => {
   return prisma.user.create({
-    data: userData,
-    include: {
-      owner: true,
-      veterinarian: true,
-    },
+    data: userData
   });
 };
 
