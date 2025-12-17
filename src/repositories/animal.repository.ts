@@ -5,6 +5,9 @@ const prisma = new PrismaClient();
 export const getAllAnimals = async (page: number, pageSize: number) => {
   const skip = (page - 1) * pageSize;
 
+  // Using a transaction to ensure `findMany` and `count` are executed on the same database snapshot
+  // This prevents pagination inconsistencies if data changes between queries
+  // Prisma docs: https://www.prisma.io/docs/orm/prisma-client/queries/transactions
   const [animals, total] = await prisma.$transaction([
     prisma.animal.findMany({
       skip,

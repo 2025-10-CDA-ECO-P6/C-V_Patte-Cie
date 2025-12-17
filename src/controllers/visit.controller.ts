@@ -33,112 +33,119 @@ export const getByIdVisit = async (req: Request, res: Response) => {
   }
 };
 
-// export const createVisitController = async (req: Request, res: Response) => {
-//   try {
-//     const { name, species, breed, dateOfBirth, picture, weight, gender, ownerId } = req.body;
+export const createVisit = async (data: {
+  date: Date;
+  reason: string;
+  visitStatus: string; 
+  observation?: string | null;
+  animalId: number;
+  veterinarianId: number;
+}) => {
+  return Prisma.visit.create({
+    data: {
+      date: data.date,
+      reason: data.reason,
+      visitStatus: data.visitStatus,
+      observation: data.observation ?? null,
+      animal: { connect: { animalId: data.animalId } },
+      veterinarian: { connect: { veterinarianId: data.veterinarianId } },
+    },
+    include: {
+      animal: true,
+      veterinarian: true,
+    },
+  });
+};
 
-//     if (!name || !species || !breed || !dateOfBirth || !weight || !gender || !ownerId) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
+export const createVisitController = async (req: Request, res: Response) => {
+  try {
+    const { date, reason, visitStatus, observation, animalId, veterinarianId } = req.body;
 
-//     if (!["M", "F"].includes(gender)) {
-//       return res.status(400).json({ message: "Invalid gender" });
-//     }
+    if (!date || !reason || !visitStatus || !animalId || !veterinarianId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
-//     const VisitData: VisitInput = {
-//       name,
-//       species,
-//       breed,
-//       dateOfBirth: new Date(dateOfBirth),
-//       picture: picture ?? null,
-//       weight,
-//       gender,
-//       ownerId: Number(ownerId),
-//     };
+    const visitData = {
+      date: new Date(date),
+      reason,
+      visitStatus,
+      observation: observation ?? null,
+      animalId: Number(animalId),
+      veterinarianId: Number(veterinarianId),
+    };
 
-//     const Visit = await createVisit(VisitData);
+    const visit = await createVisit(visitData);
 
-//     res.status(201).json({
-//       data: {
-//         id: Visit.VisitId,
-//         attributes: {
-//           name: Visit.name,
-//           species: Visit.species,
-//           breed: Visit.breed,
-//           dateOfBirth: Visit.dateOfBirth,
-//           picture: Visit.picture,
-//           weight: Visit.weight,
-//           gender: Visit.gender,
-//           owner: Visit.owner,
-//           vaccines: Visit.vaccines,
-//           visits: Visit.visits,
-//         },
-//       },
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
+    res.status(201).json({
+      data: {
+        id: visit.visitId,
+        attributes: {
+          date: visit.date,
+          reason: visit.reason,
+          visitStatus: visit.visitStatus,
+          observation: visit.observation,
+          animal: visit.animal,
+          veterinarian: visit.veterinarian,
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // export const updateVisitController = async (req: Request, res: Response) => {
 //   try {
-//     const VisitId = Number(req.params.id);
-//     if (isNaN(VisitId)) {
+//     const visitId = Number(req.params.id);
+//     if (isNaN(visitId)) {
 //       return res.status(400).json({ message: "Invalid ID" });
 //     }
 
-//     const existingVisit = await fetchByIdVisit(VisitId);
+//     const existingVisit = await fetchByIdVisit(visitId);
 //     if (!existingVisit) {
 //       return res.status(404).json({ message: "Visit not found" });
 //     }
 
-//     const data: Partial<VisitInput> = { ...req.body };
+//     const { date, reason, visitStatus, observation, animalId, veterinarianId } = req.body;
 
-//     if (isNaN(Number(data.weight))) {
-//   return res.status(400).json({ message: "Invalid weight" });
-// }
-
-//     if (data.dateOfBirth && typeof data.dateOfBirth === "string") {
-//       const parsedDate = new Date(data.dateOfBirth);
-//       if (isNaN(parsedDate.getTime())) {
-//         return res.status(400).json({ message: "Invalid dateOfBirth" });
-//       }
-//       data.dateOfBirth = parsedDate;
+//     if (!date || !reason || !visitStatus || !animalId || !veterinarianId) {
+//       return res.status(400).json({ message: "Missing required fields" });
 //     }
 
-//     if (data.gender && !["M", "F"].includes(data.gender)) {
-//       return res.status(400).json({ message: "Invalid gender" });
-//     }
+//     const visitData = {
+//       date: new Date(date),
+//       reason,
+//       visitStatus,
+//       observation: observation ?? null,
+//       animalId: Number(animalId),
+//       veterinarianId: Number(veterinarianId),
+//     };
 
-//     const updatedVisit = await updateVisit(VisitId, data);
+//     const updatedVisit = await updateVisit(visitId, visitData);
 
 //     res.status(200).json({
 //       data: {
-//         id: updatedVisit.VisitId,
+//         id: updatedVisit.visitId,
 //         attributes: {
-//           name: updatedVisit.name,
-//           species: updatedVisit.species,
-//           breed: updatedVisit.breed,
-//           dateOfBirth: updatedVisit.dateOfBirth,
-//           picture: updatedVisit.picture,
-//           weight: updatedVisit.weight,
-//           gender: updatedVisit.gender,
-//           owner: updatedVisit.owner,
-//           vaccines: updatedVisit.vaccines,
-//           visits: updatedVisit.visits,
+//           date: updatedVisit.date,
+//           reason: updatedVisit.reason,
+//           visitStatus: updatedVisit.visitStatus,
+//           observation: updatedVisit.observation,
+//           animal: updatedVisit.animal,
+//           veterinarian: updatedVisit.veterinarian,
 //         },
 //       },
 //     });
 //   } catch (err) {
 //     console.error(err);
 //     if ((err as Error).message.includes("Foreign key constraint")) {
-//       return res.status(400).json({ message: "Invalid ownerId" });
+//       return res.status(400).json({ message: "Invalid animalId or veterinarianId" });
 //     }
 //     res.status(500).json({ message: "Server error" });
 //   }
 // };
-
+  
 // export const deleteVisitController = async (req: Request, res: Response) => {
 //   try {
 //     const VisitId = Number(req.params.id);
