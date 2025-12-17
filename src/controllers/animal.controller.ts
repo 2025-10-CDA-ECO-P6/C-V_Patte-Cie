@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { fetchAllAnimals, fetchByIdAnimal, createAnimal, AnimalInput } from "../services/animal.service";
+import { fetchAllAnimals, fetchByIdAnimal, createAnimal, updateAnimal, deleteAnimal, AnimalInput } from "../services/animal.service";
+import { Prisma } from "@prisma/client";
 
 export const getAnimals = async (req: Request, res: Response) => {
   try {
@@ -66,6 +67,80 @@ export const createAnimalController = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateAnimalController = async (req: Request, res: Response) => {
+  try {
+    const animalId = Number(req.params.id);
+    if (isNaN(animalId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
+    const existingAnimal = await fetchByIdAnimal(animalId);
+    if (!existingAnimal) {
+      return res.status(404).json({ message: "Animal not found" });
+    }
+
+    const data: Partial<AnimalInput> = { ...req.body };
+
+    if (isNaN(Number(data.weight))) {
+  return res.status(400).json({ message: "Invalid weight" });
+}
+
+    if (data.dateOfBirth && typeof data.dateOfBirth === "string") {
+      const parsedDate = new Date(data.dateOfBirth);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({ message: "Invalid dateOfBirth" });
+      }
+      data.dateOfBirth = parsedDate;
+    }
+
+    if (data.gender && !["M", "F"].includes(data.gender)) {
+      return res.status(400).json({ message: "Invalid gender" });
+    }
+
+    const updatedAnimal = await updateAnimal(animalId, data);
+
+    res.status(200).json({
+      data: {
+        id: updatedAnimal.animalId,
+        attributes: {
+          name: updatedAnimal.name,
+          species: updatedAnimal.species,
+          breed: updatedAnimal.breed,
+          dateOfBirth: updatedAnimal.dateOfBirth,
+          picture: updatedAnimal.picture,
+          weight: updatedAnimal.weight,
+          gender: updatedAnimal.gender,
+          owner: updatedAnimal.owner,
+          vaccines: updatedAnimal.vaccines,
+          visits: updatedAnimal.visits,
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    if ((err as Error).message.includes("Foreign key constraint")) {
+      return res.status(400).json({ message: "Invalid ownerId" });
+    }
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteAnimalController = async (req: Request, res: Response) => {
+  try {
+    const animalId = Number(req.params.id);
+    if (isNaN(animalId)) return res.status(400).json({ message: "Invalid ID" });
+
+    await deleteAnimal(animalId);
+    res.status(204).json();
+  } catch (err) {
+    console.error(err);
+    if ((err as Error).message.includes("not found")) {
+      return res.status(404).json({ message: (err as Error).message });
+    }
     res.status(500).json({ message: "Server error" });
   }
 };

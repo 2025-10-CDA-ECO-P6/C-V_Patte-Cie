@@ -54,6 +54,39 @@ export const createAnimal = async (data: {
   });
 };
 
+export const updateAnimal = async (
+  animalId: number,
+  data: Partial<{
+    name: string;
+    species: string;
+    breed: string;
+    dateOfBirth: Date;
+    picture?: string | null;
+    weight: string;
+    gender: "M" | "F";
+    ownerId: number;
+  }>
+) => {
+  const { ownerId, ...otherData } = data;
 
+  return prisma.animal.update({
+    where: { animalId },
+    data: {
+      ...otherData,
+      ...(ownerId !== undefined ? { owner: { connect: { ownerId } } } : {}),
+    },
+    include: {
+      owner: true,
+      vaccines: true,
+      visits: true,
+    },
+  });
+};
+
+export const deleteAnimal = async (animalId: number) => {
+  return prisma.animal.delete({
+    where: { animalId },
+  });
+};
 
 export default prisma;
