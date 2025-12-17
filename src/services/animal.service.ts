@@ -1,5 +1,16 @@
 import * as animalRepo from "../repositories/animal.repository";
 
+export interface AnimalInput {
+  name: string;
+  species: string;
+  breed: string;
+  dateOfBirth: Date;
+  picture?: string | null;
+  weight: string;
+  gender: "M" | "F";
+  ownerId: number;
+}
+
 export const fetchAllAnimals = async () => {
   try {
     const animals = await animalRepo.getAllAnimals();
@@ -18,21 +29,10 @@ export const fetchByIdAnimal = async (animalId: number) => {
   }
 };
 
-export const createAnimal = async (data: {
-  name: string;
-  species: string;
-  breed: string;
-  dateOfBirth: Date;
-  picture?: string | null;
-  weight: string;
-  gender: "M" | "F";
-  ownerId: number;
-}) => {
+export const createAnimal = async (data: AnimalInput) => {
   try {
     return await animalRepo.createAnimal(data);
   } catch (error) {
-    throw new Error(
-      "Error creating animal: " + (error as Error).message
-    );
+    throw new Error("Error creating the animal: " + (error as Error).message);
   }
 };

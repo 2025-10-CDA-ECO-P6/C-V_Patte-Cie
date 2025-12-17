@@ -55,4 +55,5 @@ export const createAnimal = async (data: {
 };
 
 
+
 export default prisma;
