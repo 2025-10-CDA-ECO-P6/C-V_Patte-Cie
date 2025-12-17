@@ -1,7 +1,19 @@
-import { PrismaClient } from "@prisma/client";
-
+import { PrismaClient, user_role } from "@prisma/client";
 const prisma = new PrismaClient();
 
+//create
+export const createUser = async (userData: {
+  email: string;
+  passwordHash: string;
+  userRole: user_role;
+  createdAt: Date;
+}) => {
+  return prisma.user.create({
+    data: userData
+  });
+};
+
+//read
 export const getAllUsers = async () => {
   return prisma.user.findMany({
     include: {
@@ -11,8 +23,9 @@ export const getAllUsers = async () => {
   });
 };
 
+//read by ID
 export const getByIdUser = async (userId: number) => {
-  return prisma.user.findFirst({
+  return prisma.user.findUnique({
     where: { userId: userId },
     include: {
       owner: true,
@@ -20,3 +33,14 @@ export const getByIdUser = async (userId: number) => {
     },
   });
 };
+
+//read by email
+export const getUserByEmail = async (email: string) => {
+  return prisma.user.findUnique({
+    where: { email: email },
+  });
+};
+
+// update
+
+// delete

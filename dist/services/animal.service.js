@@ -33,10 +33,34 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAnimals = void 0;
-const animalRepository = __importStar(require("../repositories/animal.repository"));
-const getAllAnimals = async () => {
-    const animals = await animalRepository.getAllAnimals();
-    return animals;
+exports.createAnimal = exports.fetchByIdAnimal = exports.fetchAllAnimals = void 0;
+const animalRepo = __importStar(require("../repositories/animal.repository"));
+const fetchAllAnimals = async () => {
+    try {
+        const animals = await animalRepo.getAllAnimals();
+        return animals;
+    }
+    catch (error) {
+        throw new Error("Error fetching animals: " + error.message);
+    }
 };
-exports.getAllAnimals = getAllAnimals;
+exports.fetchAllAnimals = fetchAllAnimals;
+const fetchByIdAnimal = async (animalId) => {
+    try {
+        const animal = await animalRepo.getByIdAnimal(animalId);
+        return animal;
+    }
+    catch (error) {
+        throw new Error("Error fetching animal: " + error.message);
+    }
+};
+exports.fetchByIdAnimal = fetchByIdAnimal;
+const createAnimal = async (data) => {
+    try {
+        return await animalRepo.createAnimal(data);
+    }
+    catch (error) {
+        throw new Error("Error creating the animal: " + error.message);
+    }
+};
+exports.createAnimal = createAnimal;

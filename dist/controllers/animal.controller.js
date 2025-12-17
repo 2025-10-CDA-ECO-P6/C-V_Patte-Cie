@@ -1,47 +1,71 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAnimals = void 0;
-const animalService = __importStar(require("../services/animal.service"));
-const getAllAnimals = async (req, res, next) => {
+exports.createAnimalController = exports.getByIdAnimal = exports.getAnimals = void 0;
+const animal_service_1 = require("../services/animal.service");
+const getAnimals = async (req, res) => {
     try {
-        const animals = await animalService.getAllAnimals();
+        const animals = await (0, animal_service_1.fetchAllAnimals)();
         res.status(200).json(animals);
     }
-    catch (error) {
-        next(error);
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
     }
 };
-exports.getAllAnimals = getAllAnimals;
+exports.getAnimals = getAnimals;
+const getByIdAnimal = async (req, res) => {
+    try {
+        const animalId = Number.parseInt(req.params.id);
+        const animal = await (0, animal_service_1.fetchByIdAnimal)(animalId);
+        res.status(200).json(animal);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+exports.getByIdAnimal = getByIdAnimal;
+const createAnimalController = async (req, res) => {
+    try {
+        const { name, species, breed, dateOfBirth, picture, weight, gender, ownerId } = req.body;
+        if (!name || !species || !breed || !dateOfBirth || !weight || !gender || !ownerId) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+        if (!["M", "F"].includes(gender)) {
+            return res.status(400).json({ message: "Invalid gender" });
+        }
+        const animalData = {
+            name,
+            species,
+            breed,
+            dateOfBirth: new Date(dateOfBirth),
+            picture: picture ?? null,
+            weight,
+            gender,
+            ownerId: Number(ownerId),
+        };
+        const animal = await (0, animal_service_1.createAnimal)(animalData);
+        res.status(201).json({
+            data: {
+                id: animal.animalId,
+                attributes: {
+                    name: animal.name,
+                    species: animal.species,
+                    breed: animal.breed,
+                    dateOfBirth: animal.dateOfBirth,
+                    picture: animal.picture,
+                    weight: animal.weight,
+                    gender: animal.gender,
+                    owner: animal.owner,
+                    vaccines: animal.vaccines,
+                    visits: animal.visits,
+                },
+            },
+        });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+exports.createAnimalController = createAnimalController;
