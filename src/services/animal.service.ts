@@ -33,6 +33,6 @@ export const createAnimal = async (data: AnimalInput) => {
   try {
     return await animalRepo.createAnimal(data);
   } catch (error) {
-    throw new Error("Erreur lors de la création de l'animal: " + (error as Error).message);
+    throw new Error("Error creating the animal: " + (error as Error).message);
   }
 };

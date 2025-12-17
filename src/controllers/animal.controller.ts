@@ -7,7 +7,7 @@ export const getAnimals = async (req: Request, res: Response) => {
     res.status(200).json(animals);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -18,7 +18,7 @@ export const getByIdAnimal = async (req: Request, res: Response) => {
     res.status(200).json(animal);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -27,11 +27,11 @@ export const createAnimalController = async (req: Request, res: Response) => {
     const { name, species, breed, dateOfBirth, picture, weight, gender, ownerId } = req.body;
 
     if (!name || !species || !breed || !dateOfBirth || !weight || !gender || !ownerId) {
-      return res.status(400).json({ message: "Champs manquants" });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     if (!["M", "F"].includes(gender)) {
-      return res.status(400).json({ message: "Genre invalide" });
+      return res.status(400).json({ message: "Invalid gender" });
     }
 
     const animalData: AnimalInput = {
@@ -46,9 +46,26 @@ export const createAnimalController = async (req: Request, res: Response) => {
     };
 
     const animal = await createAnimal(animalData);
-    res.status(201).json(animal);
+
+    res.status(201).json({
+      data: {
+        id: animal.animalId,
+        attributes: {
+          name: animal.name,
+          species: animal.species,
+          breed: animal.breed,
+          dateOfBirth: animal.dateOfBirth,
+          picture: animal.picture,
+          weight: animal.weight,
+          gender: animal.gender,
+          owner: animal.owner,
+          vaccines: animal.vaccines,
+          visits: animal.visits,
+        },
+      },
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(500).json({ message: "Server error" });
   }
 };
