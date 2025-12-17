@@ -17,3 +17,22 @@ export const fetchByIdAnimal = async (animalId: number) => {
     throw new Error("Error fetching animal: " + (error as Error).message);
   }
 };
+
+export const createAnimal = async (data: {
+  name: string;
+  species: string;
+  breed: string;
+  dateOfBirth: Date;
+  picture?: string | null;
+  weight: string;
+  gender: "M" | "F";
+  ownerId: number;
+}) => {
+  try {
+    return await animalRepo.createAnimal(data);
+  } catch (error) {
+    throw new Error(
+      "Error creating animal: " + (error as Error).message
+    );
+  }
+};
