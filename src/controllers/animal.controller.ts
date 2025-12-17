@@ -1,24 +1,57 @@
 import { Request, Response } from "express";
 import { fetchAllAnimals, fetchByIdAnimal, createAnimal, updateAnimal, deleteAnimal, AnimalInput } from "../services/animal.service";
 import { Prisma } from "@prisma/client";
+import { mapAnimal } from "../utils/animal.mapper";
 
 export const getAnimals = async (req: Request, res: Response) => {
   try {
-    const animals = await fetchAllAnimals();
-    res.status(200).json(animals);
-  } catch (err) {
-    console.error(err);
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    if (page <= 0 || pageSize <= 0) {
+      return res.status(400).json({ message: "Invalid pagination parameters" });
+    }
+
+    const { animals, total } = await fetchAllAnimals(page, pageSize);
+
+    const pageCount = Math.ceil(total / pageSize);
+
+    res.status(200).json({
+      data: animals.map(mapAnimal),
+      meta: {
+        pagination: {
+          page,
+          pageSize,
+          pageCount,
+          total,
+        },
+      },
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-export const getByIdAnimal = async (req: Request, res: Response) => {
+export const getByIdAnimalController = async (req: Request, res: Response) => {
   try {
-    const animalId = Number.parseInt(req.params.id);
+    const animalId = Number(req.params.id);
+
+    if (isNaN(animalId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
     const animal = await fetchByIdAnimal(animalId);
-    res.status(200).json(animal);
-  } catch (err) {
-    console.error(err);
+
+    res.status(200).json({
+      data: mapAnimal(animal),
+    });
+  } catch (error) {
+    if ((error as Error).message.includes("not found")) {
+      return res.status(404).json({ message: "Animal not found" });
+    }
+
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };

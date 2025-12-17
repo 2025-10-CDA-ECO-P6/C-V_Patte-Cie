@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { 
   getVisits, 
-  // getByIdVisit, 
+  getByIdVisit, 
   // // createVisitController, 
   // // updateVisitController, 
   // // deleteVisitController 
@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("/", getVisits);
-// router.get("/:id", getByIdVisit);
+router.get("/:id", getByIdVisit);
 // router.post("/", createVisitController);
 // router.put("/:id", updateVisitController);
 // router.delete("/:id", deleteVisitController);

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchAllVisits } from "../services/visit.service";
+import { fetchAllVisits, fetchByIdVisit } from "../services/visit.service";
 // import { fetchAllVisits, fetchByIdVisit, createVisit, updateVisit, deleteVisit, VisitInput } from "../services/Visit.service";
 import { Prisma } from "@prisma/client";
 
@@ -13,16 +13,25 @@ export const getVisits = async (req: Request, res: Response) => {
   }
 };
 
-// export const getByIdVisit = async (req: Request, res: Response) => {
-//   try {
-//     const VisitId = Number.parseInt(req.params.id);
-//     const Visit = await fetchByIdVisit(VisitId);
-//     res.status(200).json(Visit);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
+export const getByIdVisit = async (req: Request, res: Response) => {
+  try {
+    const visitId = Number(req.params.id);
+
+    if (isNaN(visitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
+    const visit = await fetchByIdVisit(visitId);
+    res.status(200).json(visit);
+  } catch (error) {
+    if ((error as Error).message === "Visit not found") {
+      return res.status(404).json({ message: "Visit not found" });
+    }
+
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // export const createVisitController = async (req: Request, res: Response) => {
 //   try {

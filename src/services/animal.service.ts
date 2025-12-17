@@ -13,13 +13,11 @@ export interface AnimalInput {
   ownerId: number;
 }
 
-export const fetchAllAnimals = async () => {
-  try {
-    const animals = await animalRepo.getAllAnimals();
-    return animals;
-  } catch (error) {
-    throw new Error("Error fetching animals: " + (error as Error).message);
-  }
+export const fetchAllAnimals = async (
+  page: number,
+  pageSize: number
+) => {
+  return animalRepo.getAllAnimals(page, pageSize);
 };
 
 export const fetchByIdAnimal = async (animalId: number) => {

@@ -21,14 +21,15 @@ export const fetchAllVisits = async () => {
   }
 };
 
-// export const fetchByIdAnimal = async (animalId: number) => {
-//   try {
-//     const animal = await animalRepo.getByIdAnimal(animalId);
-//     return animal;
-//   } catch (error) {
-//     throw new Error("Error fetching animal: " + (error as Error).message);
-//   }
-// };
+export const fetchByIdVisit = async (visitId: number) => {
+  const visit = await visitRepo.getByIdVisit(visitId);
+
+  if (!visit) {
+    throw new Error("Visit not found");
+  }
+
+  return visit;
+};
 
 // export const createAnimal = async (data: AnimalInput) => {
 //   try {

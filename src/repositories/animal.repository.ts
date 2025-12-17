@@ -2,14 +2,26 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getAllAnimals = async () => {
-  return prisma.animal.findMany({
-    include: {
-      owner: true,
-      vaccines: true,
-      visits: true,
-    },
-  });
+export const getAllAnimals = async (page: number, pageSize: number) => {
+  const skip = (page - 1) * pageSize;
+
+  const [animals, total] = await prisma.$transaction([
+    prisma.animal.findMany({
+      skip,
+      take: pageSize,
+      include: {
+        owner: true,
+        vaccines: true,
+        visits: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    prisma.animal.count(),
+  ]);
+
+  return { animals, total };
 };
 
 export const getByIdAnimal = async (animalId: number) => {
