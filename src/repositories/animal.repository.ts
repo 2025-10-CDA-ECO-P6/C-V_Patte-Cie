@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { AnimalInput, AnimalUpdateInput } from "../types";
 
 const prisma = new PrismaClient();
 
@@ -38,16 +39,7 @@ export const getByIdAnimal = async (animalId: number) => {
   });
 };
 
-export const createAnimal = async (data: {
-  name: string;
-  species: string;
-  breed: string;
-  dateOfBirth: Date;
-  picture?: string | null;
-  weight: string;
-  gender: "M" | "F";
-  ownerId: number;
-}) => {
+export const createAnimal = async (data: AnimalInput) => {
   return prisma.animal.create({
     data: {
       name: data.name,
@@ -71,16 +63,7 @@ export const createAnimal = async (data: {
 
 export const updateAnimal = async (
   animalId: number,
-  data: Partial<{
-    name: string;
-    species: string;
-    breed: string;
-    dateOfBirth: Date;
-    picture?: string | null;
-    weight: string;
-    gender: "M" | "F";
-    ownerId: number;
-  }>
+  data: AnimalUpdateInput
 ) => {
   const { ownerId, ...otherData } = data;
 

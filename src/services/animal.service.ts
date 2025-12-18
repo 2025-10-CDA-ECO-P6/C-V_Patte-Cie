@@ -1,17 +1,6 @@
 import * as animalRepo from "../repositories/animal.repository";
+import { AnimalInput, AnimalUpdateInput, AnimalWithRelations } from "../types";
 import { Prisma } from "@prisma/client";
-
-
-export interface AnimalInput {
-  name: string;
-  species: string;
-  breed: string;
-  dateOfBirth: Date;
-  picture?: string | null;
-  weight: string;
-  gender: "M" | "F";
-  ownerId: number;
-}
 
 export const fetchAllAnimals = async (
   page: number,
@@ -29,15 +18,18 @@ export const fetchByIdAnimal = async (animalId: number) => {
   }
 };
 
-export const createAnimal = async (data: AnimalInput) => {
+export const createAnimal = async (data: AnimalInput): Promise<AnimalWithRelations> => {
   try {
-    return await animalRepo.createAnimal(data);
+    return await animalRepo.createAnimal({
+      ...data,
+      weight: new Prisma.Decimal(data.weight), 
+    });
   } catch (error) {
     throw new Error("Error creating the animal: " + (error as Error).message);
   }
 };
 
-export const updateAnimal = async (animalId: number, data: Partial<AnimalInput>) => {
+export const updateAnimal = async (animalId: number, data: AnimalUpdateInput) => {
   try {
     return await animalRepo.updateAnimal(animalId, data);
   } catch (error) {

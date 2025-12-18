@@ -1,12 +1,46 @@
 import { Request, Response } from "express";
-import { fetchAllVisits, fetchByIdVisit } from "../services/visit.service";
-// import { fetchAllVisits, fetchByIdVisit, createVisit, updateVisit, deleteVisit, VisitInput } from "../services/Visit.service";
-import { Prisma } from "@prisma/client";
+import { fetchAllVisits, fetchByIdVisit, createVisit, updateVisit, deleteVisit } from "../services/visit.service";
+import { VisitInput, VisitUpdateInput, VisitStatus, VisitWithRelations } from "../types";
+import { fetchByIdAnimal } from "../services/animal.service";
+
+const formatVisitResponse = (visit: VisitWithRelations) => ({
+  id: visit.visitId,
+  attributes: {
+    date: visit.date,
+    reason: visit.reason,
+    visitStatus: visit.visitStatus,
+    observation: visit.observation,
+    animal: visit.animal,
+    veterinarian: visit.veterinarian,
+    createdAt: visit.createdAt,
+    updatedAt: visit.updatedAt,
+  },
+});
 
 export const getVisits = async (req: Request, res: Response) => {
   try {
-    const visits = await fetchAllVisits();
-    res.status(200).json(visits);
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    if (page <= 0 || pageSize <= 0) {
+      return res.status(400).json({ message: "Invalid pagination parameters" });
+    }
+
+    const { visits, total } = await fetchAllVisits(page, pageSize);
+
+    const pageCount = Math.ceil(total / pageSize);
+
+    res.status(200).json({
+      data: visits.map(formatVisitResponse),
+      meta: {
+        pagination: {
+          page,
+          pageSize,
+          pageCount,
+          total,
+        },
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -33,30 +67,6 @@ export const getByIdVisit = async (req: Request, res: Response) => {
   }
 };
 
-export const createVisit = async (data: {
-  date: Date;
-  reason: string;
-  visitStatus: string; 
-  observation?: string | null;
-  animalId: number;
-  veterinarianId: number;
-}) => {
-  return Prisma.visit.create({
-    data: {
-      date: data.date,
-      reason: data.reason,
-      visitStatus: data.visitStatus,
-      observation: data.observation ?? null,
-      animal: { connect: { animalId: data.animalId } },
-      veterinarian: { connect: { veterinarianId: data.veterinarianId } },
-    },
-    include: {
-      animal: true,
-      veterinarian: true,
-    },
-  });
-};
-
 export const createVisitController = async (req: Request, res: Response) => {
   try {
     const { date, reason, visitStatus, observation, animalId, veterinarianId } = req.body;
@@ -65,7 +75,18 @@ export const createVisitController = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const visitData = {
+    const animal = await fetchByIdAnimal(Number(animalId));
+    if (!animal) {
+      return res.status(404).json({ message: `Animal with id ${animalId} not found` });
+    }
+
+    // Vérifier que le vétérinaire existe -> quand crud sera fait
+    // const vet = await fetchByIdVeterinarian(Number(veterinarianId));
+    // if (!vet) {
+    //   return res.status(404).json({ message: `Veterinarian with id ${veterinarianId} not found` });
+    // }
+
+    const visitData: VisitInput = {
       date: new Date(date),
       reason,
       visitStatus,
@@ -89,75 +110,75 @@ export const createVisitController = async (req: Request, res: Response) => {
         },
       },
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const updateVisitController = async (req: Request, res: Response) => {
+  try {
+    const visitId = Number(req.params.id);
+
+    if (Number.isNaN(visitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
+    const existingVisit = await fetchByIdVisit(visitId);
+    if (!existingVisit) {
+      return res.status(404).json({ message: "Visit not found" });
+    }
+
+    const {
+      date,
+      reason,
+      visitStatus,
+      observation,
+      animalId,
+      veterinarianId,
+    } = req.body;
+
+    const visitData: VisitUpdateInput = {
+      ...(date && { date: new Date(date) }),
+      ...(reason && { reason }),
+      ...(visitStatus && { visitStatus: visitStatus as VisitStatus }),
+      ...(observation !== undefined && { observation }),
+      ...(animalId && { animalId: Number(animalId) }),
+      ...(veterinarianId && { veterinarianId: Number(veterinarianId) }),
+    };
+
+    const updatedVisit = await updateVisit(visitId, visitData);
+
+    res.status(200).json(updatedVisit);
+  } catch (error) {
+    console.error(error);
+
+    if ((error as Error).message.includes("Foreign key constraint")) {
+      return res
+        .status(400)
+        .json({ message: "Invalid animalId or veterinarianId" });
+    }
+
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// export const updateVisitController = async (req: Request, res: Response) => {
-//   try {
-//     const visitId = Number(req.params.id);
-//     if (isNaN(visitId)) {
-//       return res.status(400).json({ message: "Invalid ID" });
-//     }
+export const deleteVisitController = async (req: Request, res: Response) => {
+  try {
+    const visitId = Number(req.params.id);
 
-//     const existingVisit = await fetchByIdVisit(visitId);
-//     if (!existingVisit) {
-//       return res.status(404).json({ message: "Visit not found" });
-//     }
+    if (Number.isNaN(visitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
-//     const { date, reason, visitStatus, observation, animalId, veterinarianId } = req.body;
+    await deleteVisit(visitId);
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
 
-//     if (!date || !reason || !visitStatus || !animalId || !veterinarianId) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
+    if ((error as Error).message.includes("Record to delete does not exist")) {
+      return res.status(404).json({ message: "Visit not found" });
+    }
 
-//     const visitData = {
-//       date: new Date(date),
-//       reason,
-//       visitStatus,
-//       observation: observation ?? null,
-//       animalId: Number(animalId),
-//       veterinarianId: Number(veterinarianId),
-//     };
-
-//     const updatedVisit = await updateVisit(visitId, visitData);
-
-//     res.status(200).json({
-//       data: {
-//         id: updatedVisit.visitId,
-//         attributes: {
-//           date: updatedVisit.date,
-//           reason: updatedVisit.reason,
-//           visitStatus: updatedVisit.visitStatus,
-//           observation: updatedVisit.observation,
-//           animal: updatedVisit.animal,
-//           veterinarian: updatedVisit.veterinarian,
-//         },
-//       },
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     if ((err as Error).message.includes("Foreign key constraint")) {
-//       return res.status(400).json({ message: "Invalid animalId or veterinarianId" });
-//     }
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-  
-// export const deleteVisitController = async (req: Request, res: Response) => {
-//   try {
-//     const VisitId = Number(req.params.id);
-//     if (isNaN(VisitId)) return res.status(400).json({ message: "Invalid ID" });
-
-//     await deleteVisit(VisitId);
-//     res.status(204).json();
-//   } catch (err) {
-//     console.error(err);
-//     if ((err as Error).message.includes("not found")) {
-//       return res.status(404).json({ message: (err as Error).message });
-//     }
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
+    res.status(500).json({ message: "Server error" });
+  }
+};

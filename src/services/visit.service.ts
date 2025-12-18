@@ -1,21 +1,10 @@
 import * as visitRepo from "../repositories/visit.repository";
-import { Prisma } from "@prisma/client";
+import { VisitInput, VisitUpdateInput } from "../types";
 
 
-// export interface AnimalInput {
-//   name: string;
-//   species: string;
-//   breed: string;
-//   dateOfBirth: Date;
-//   picture?: string | null;
-//   weight: string;
-//   gender: "M" | "F";
-//   ownerId: number;
-// }
-
-export const fetchAllVisits = async () => {
+export const fetchAllVisits = async ( page: number, pageSize: number) => {
   try {
-    return await visitRepo.getAllVisits();
+    return await visitRepo.getAllVisits(page, pageSize);
   } catch (error) {
     throw new Error("Error fetching visits");
   }
@@ -31,26 +20,35 @@ export const fetchByIdVisit = async (visitId: number) => {
   return visit;
 };
 
-// export const createAnimal = async (data: AnimalInput) => {
-//   try {
-//     return await animalRepo.createAnimal(data);
-//   } catch (error) {
-//     throw new Error("Error creating the animal: " + (error as Error).message);
-//   }
-// };
+export const createVisit = async (data: VisitInput) => {
+  try {
+    return await visitRepo.createVisit(data);
+  } catch (error) {
+    throw new Error(
+      "Error creating the visit: " + (error as Error).message
+    );
+  }
+};
 
-// export const updateAnimal = async (animalId: number, data: Partial<AnimalInput>) => {
-//   try {
-//     return await animalRepo.updateAnimal(animalId, data);
-//   } catch (error) {
-//     throw new Error("Error updating the animal: " + (error as Error).message);
-//   }
-// };
+export const updateVisit = async (
+  visitId: number,
+  data: VisitUpdateInput
+) => {
+  try {
+    return await visitRepo.updateVisit(visitId, data);
+  } catch (error) {
+    throw new Error(
+      "Error updating the visit: " + (error as Error).message
+    );
+  }
+};
 
-// export const deleteAnimal = async (animalId: number) => {
-//   try {
-//     return await animalRepo.deleteAnimal(animalId);
-//   } catch (error) {
-//     throw new Error("Error deleting the animal: " + (error as Error).message);
-//   }
-// };
+export const deleteVisit = async (visitId: number) => {
+  try {
+    return await visitRepo.deleteVisit(visitId);
+  } catch (error) {
+    throw new Error(
+      "Error deleting the visit: " + (error as Error).message
+    );
+  }
+};

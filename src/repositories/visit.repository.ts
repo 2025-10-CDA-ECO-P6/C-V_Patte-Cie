@@ -1,94 +1,89 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, visit_status } from "@prisma/client";
+import { VisitInput, VisitUpdateInput } from "../types";
 
 const prisma = new PrismaClient();
 
-export const getAllVisits = async () => {
-  return prisma.visit.findMany({
-    include: {
-      animal: true,
-      veterinarian: true,
-    },
-    orderBy: {
-      date: "desc",
-    },
-  });
+export const getAllVisits = async (page: number, pageSize: number) => {
+  const skip = (page - 1) * pageSize;
+
+  const [visits, total] = await prisma.$transaction([
+    prisma.visit.findMany({
+      skip,
+      take: pageSize,
+      include: {
+        animal: true,
+        veterinarian: true,
+      },
+      orderBy: {
+        date: "desc",
+      },
+    }),
+    prisma.visit.count(),
+  ]);
+
+  return { visits, total };
 };
 
 
 export const getByIdVisit = async (visitId: number) => {
   return prisma.visit.findUnique({
     where: { visitId },
-     include: {
+    include: {
       animal: true,
       veterinarian: true,
     },
   });
 };
 
-// export const createvisit = async (data: {
-//   name: string;
-//   species: string;
-//   breed: string;
-//   dateOfBirth: Date;
-//   picture?: string | null;
-//   weight: string;
-//   gender: "M" | "F";
-//   ownerId: number;
-// }) => {
-//   return prisma.visit.create({
-//     data: {
-//       name: data.name,
-//       species: data.species,
-//       breed: data.breed,
-//       dateOfBirth: data.dateOfBirth,
-//       picture: data.picture ?? null,
-//       weight: data.weight,
-//       gender: data.gender,
-//       owner: {
-//         connect: { ownerId: data.ownerId },
-//       },
-//     },
-//     include: {
-//       owner: true,
-//       vaccines: true,
-//       visits: true,
-//     },
-//   });
-// };
+export const createVisit = async (data: VisitInput) => {
+  return prisma.visit.create({
+    data: {
+      date: data.date,
+      reason: data.reason,
+      visitStatus: data.visitStatus as visit_status,
+      observation: data.observation ?? null,
+      animal: {
+        connect: { animalId: data.animalId },
+      },
+      veterinarian: {
+        connect: { veterinarianId: data.veterinarianId },
+      },
+    },
+    include: {
+      animal: true,
+      veterinarian: true,
+    },
+  });
+};
 
-// export const updatevisit = async (
-//   visitId: number,
-//   data: Partial<{
-//     name: string;
-//     species: string;
-//     breed: string;
-//     dateOfBirth: Date;
-//     picture?: string | null;
-//     weight: string;
-//     gender: "M" | "F";
-//     ownerId: number;
-//   }>
-// ) => {
-//   const { ownerId, ...otherData } = data;
+export const updateVisit = async (
+  visitId: number,
+  data: VisitUpdateInput
+) => {
+  const { animalId, veterinarianId, ...otherData } = data;
 
-//   return prisma.visit.update({
-//     where: { visitId },
-//     data: {
-//       ...otherData,
-//       ...(ownerId !== undefined ? { owner: { connect: { ownerId } } } : {}),
-//     },
-//     include: {
-//       owner: true,
-//       vaccines: true,
-//       visits: true,
-//     },
-//   });
-// };
+  return prisma.visit.update({
+    where: { visitId },
+    data: {
+      ...otherData,
+      ...(animalId !== undefined && {
+        animal: { connect: { animalId } },
+      }),
+      ...(veterinarianId !== undefined && {
+        veterinarian: { connect: { veterinarianId } },
+      }),
+    },
+    include: {
+      animal: true,
+      veterinarian: true,
+    },
+  });
+};
 
-// export const deletevisit = async (visitId: number) => {
-//   return prisma.visit.delete({
-//     where: { visitId },
-//   });
-// };
+export const deleteVisit = async (visitId: number) => {
+  return prisma.visit.delete({
+    where: { visitId },
+  });
+};
 
 export default prisma;
