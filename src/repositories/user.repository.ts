@@ -64,6 +64,33 @@ export const getUserByEmail = async (email: string) => {
 };
 
 // update
+export const updateUser = async (
+  userId: number,
+  data: {
+    email?: string;
+    passwordHash?: string | undefined;
+    userRole?: user_role;
+  }
+) => {
+  return prisma.user.update({
+    where: { userId },
+    data: {
+      email: data.email,
+      passwordHash: data.passwordHash,
+      userRole: data.userRole,
+      updatedAt: new Date(), // Mise à jour automatique du timestamp
+    },
+    select: {
+      userId: true,
+      email: true,
+      userRole: true,
+      createdAt: true,
+      updatedAt: true,
+      owner: true,
+      veterinarian: true,
+    },
+  });
+};
 
 // delete
 export const deleteUser = async (userId: number) => {
