@@ -162,9 +162,7 @@ export const patchUser = async (req: Request, res: Response) => {
         attributes: {
           email: updatedUser.email,
           createdAt: updatedUser.createdAt,
-          updatedAt: updatedUser.updatedAt,
-          owner: updatedUser.owner,
-          veterinarian: updatedUser.veterinarian,
+          updatedAt: updatedUser.updatedAt
         },
       },
     });
