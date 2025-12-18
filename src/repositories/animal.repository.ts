@@ -1,15 +1,31 @@
 import { PrismaClient } from "@prisma/client";
+import { AnimalInput, AnimalUpdateInput } from "../types";
 
 const prisma = new PrismaClient();
 
-export const getAllAnimals = async () => {
-  return prisma.animal.findMany({
-    include: {
-      owner: true,
-      vaccines: true,
-      visits: true,
-    },
-  });
+export const getAllAnimals = async (page: number, pageSize: number) => {
+  const skip = (page - 1) * pageSize;
+
+  // Using a transaction to ensure `findMany` and `count` are executed on the same database snapshot
+  // This prevents pagination inconsistencies if data changes between queries
+  // Prisma docs: https://www.prisma.io/docs/orm/prisma-client/queries/transactions
+  const [animals, total] = await prisma.$transaction([
+    prisma.animal.findMany({
+      skip,
+      take: pageSize,
+      include: {
+        owner: true,
+        vaccines: true,
+        visits: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    prisma.animal.count(),
+  ]);
+
+  return { animals, total };
 };
 
 export const getByIdAnimal = async (animalId: number) => {
@@ -23,16 +39,7 @@ export const getByIdAnimal = async (animalId: number) => {
   });
 };
 
-export const createAnimal = async (data: {
-  name: string;
-  species: string;
-  breed: string;
-  dateOfBirth: Date;
-  picture?: string | null;
-  weight: string;
-  gender: "M" | "F";
-  ownerId: number;
-}) => {
+export const createAnimal = async (data: AnimalInput) => {
   return prisma.animal.create({
     data: {
       name: data.name,
@@ -56,16 +63,7 @@ export const createAnimal = async (data: {
 
 export const updateAnimal = async (
   animalId: number,
-  data: Partial<{
-    name: string;
-    species: string;
-    breed: string;
-    dateOfBirth: Date;
-    picture?: string | null;
-    weight: string;
-    gender: "M" | "F";
-    ownerId: number;
-  }>
+  data: AnimalUpdateInput
 ) => {
   const { ownerId, ...otherData } = data;
 
