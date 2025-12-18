@@ -60,7 +60,7 @@ model Animal {
   ownerId     Int       @map("owner_id")
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  owner       Owner     @relation(fields: [ownerId], references: [ownerId], map: "fk_animal_owner")
+  owner       Owner     @relation(fields: [ownerId], references: [ownerId], onDelete: Cascade, map: "fk_animal_owner")
   vaccines    Vaccine[]
   visits      Visit[]
 

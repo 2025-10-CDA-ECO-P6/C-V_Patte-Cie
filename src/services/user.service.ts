@@ -60,10 +60,10 @@ export const createNewUser = async (userData: CreateUserDTO) => {
 };
 
 // read
-export const fetchAllUsers = async () => {
+export const fetchAllUsers = async (page: number = 1, pageSize: number = 25) => {
   try {
-    const users = await userRepo.getAllUsers();
-    return users;
+    const result = await userRepo.getAllUsers(page, pageSize);
+    return result;
   } catch (error) {
     throw new Error("Error fetching users: " + (error as Error).message);
   }
@@ -83,3 +83,18 @@ export const fetchByIdUser = async (userId: number) => {
 // update
 
 // delete
+export const deleteUserById = async (userId: number) => {
+  try {
+    const user = await userRepo.getByIdUser(userId);
+    
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    await userRepo.deleteUser(userId);
+    
+    return { message: "User successfully deleted" };
+  } catch (error) {
+    throw new Error("Error deleting user: " + (error as Error).message);
+  }
+};

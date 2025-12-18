@@ -14,20 +14,42 @@ export const createUser = async (userData: {
 };
 
 //read
-export const getAllUsers = async () => {
-  return prisma.user.findMany({
-    include: {
-      owner: true,
-      veterinarian: true,
-    },
-  });
+export const getAllUsers = async (page: number = 1, pageSize: number = 25) => {
+  const skip = (page - 1) * pageSize;
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      skip,
+      take: pageSize,
+      select: {
+        userId: true,
+        email: true,
+        userRole: true,
+        createdAt: true,
+        updatedAt: true,
+        owner: true,
+        veterinarian: true,
+      },
+    }),
+    prisma.user.count(),
+  ]);
+
+  return {
+    data: users,
+    total,
+  };
 };
 
 //read by ID
 export const getByIdUser = async (userId: number) => {
   return prisma.user.findUnique({
     where: { userId: userId },
-    include: {
+    select: {
+      userId: true,
+      email: true,
+      userRole: true,
+      createdAt: true,
+      updatedAt: true,
       owner: true,
       veterinarian: true,
     },
@@ -44,3 +66,33 @@ export const getUserByEmail = async (email: string) => {
 // update
 
 // delete
+export const deleteUser = async (userId: number) => {
+  return prisma.$transaction(async (tx) => {
+    const owner = await tx.owner.findUnique({
+      where: { userId: userId },
+      select: { ownerId: true }
+    });
+    if (owner) {
+      await tx.animal.deleteMany({
+        where: { ownerId: owner.ownerId }
+      });
+      await tx.owner.delete({
+        where: { ownerId: owner.ownerId }
+      });
+    }
+
+    const veterinarian = await tx.veterinarian.findUnique({
+      where: { userId: userId },
+      select: { veterinarianId: true }
+    });
+    if (veterinarian) {
+      await tx.veterinarian.delete({
+        where: { veterinarianId: veterinarian.veterinarianId }
+      });
+    }
+
+    return tx.user.delete({
+      where: { userId: userId }
+    });
+  });
+};
