@@ -101,8 +101,6 @@ export const getByIdUser = async (req: Request, res: Response) => {
           userRole: user.userRole,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          owner: user.owner,
-          veterinarian: user.veterinarian,
         },
       },
     });

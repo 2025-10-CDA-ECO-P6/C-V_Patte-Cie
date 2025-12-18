@@ -83,8 +83,6 @@ export const updateUser = async (
       userRole: true,
       createdAt: true,
       updatedAt: true,
-      owner: true,
-      veterinarian: true,
     },
   });
 };
