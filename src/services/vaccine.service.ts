@@ -1,54 +1,20 @@
-import * as visitRepo from "../repositories/visit.repository";
-import { VisitInput, VisitUpdateInput } from "../types";
+import * as vaccineRepo from "../repositories/vaccine.repository";
+import { VaccineInput, VaccineUpdateInput, VaccineWithRelations } from "../types";
 
-
-export const fetchAllVisits = async ( page: number, pageSize: number) => {
+export const fetchAllVaccines = async ( page: number, pageSize: number) => {
   try {
-    return await visitRepo.getAllVisits(page, pageSize);
+    return await vaccineRepo.getAllVaccines(page, pageSize);
   } catch (error) {
-    throw new Error("Error fetching visits");
+    throw new Error("Error fetching vaccines");
   }
 };
 
-export const fetchByIdVisit = async (visitId: number) => {
-  const visit = await visitRepo.getByIdVisit(visitId);
+export const fetchByIdVaccine = async (vaccineId: number) => {
+  const vaccine = await vaccineRepo.getByIdVaccine(vaccineId);
 
-  if (!visit) {
-    throw new Error("Visit not found");
+  if (!vaccine) {
+    throw new Error("vaccine not found");
   }
 
-  return visit;
-};
-
-export const createVisit = async (data: VisitInput) => {
-  try {
-    return await visitRepo.createVisit(data);
-  } catch (error) {
-    throw new Error(
-      "Error creating the visit: " + (error as Error).message
-    );
-  }
-};
-
-export const updateVisit = async (
-  visitId: number,
-  data: VisitUpdateInput
-) => {
-  try {
-    return await visitRepo.updateVisit(visitId, data);
-  } catch (error) {
-    throw new Error(
-      "Error updating the visit: " + (error as Error).message
-    );
-  }
-};
-
-export const deleteVisit = async (visitId: number) => {
-  try {
-    return await visitRepo.deleteVisit(visitId);
-  } catch (error) {
-    throw new Error(
-      "Error deleting the visit: " + (error as Error).message
-    );
-  }
+  return vaccine;
 };

@@ -4,17 +4,17 @@ export type VaccineStatus = "pending" | "administered" | "expired";
 
 export interface Vaccine {
   vaccineId: number;
-  name: String;
-  administrationDate?: Date;
+  name: string;
+  administrationDate?: Date |null;
   vaccineStatus: VaccineStatus;
   reminderDelays: number[];
-  veterinarianId: number;
+  veterinarianId?: number | null;
   animalId?: number;
   updatedAt: Date | null;
   createdAt: Date | null;
 }
 
-export type VaccineWithRelations = Prisma.VisitGetPayload<{
+export type VaccineWithRelations = Prisma.VaccineGetPayload<{
   include: {
     animal: true;
     veterinarian: true;
@@ -23,9 +23,8 @@ export type VaccineWithRelations = Prisma.VisitGetPayload<{
 
 // Creat
 export interface VaccineInput {
-  name: String;
+  name: string;
   administrationDate: Date;
-  reason: string;
   vaccineStatus: VaccineStatus;
   reminderDelays: number[];
   animalId?: number;

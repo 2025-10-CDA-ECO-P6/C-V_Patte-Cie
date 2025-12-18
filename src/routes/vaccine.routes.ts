@@ -1,18 +1,20 @@
 import { Router } from "express";
-import { 
-  getVisits, 
-  getByIdVisit, 
-  createVisitController, 
-  updateVisitController, 
-  deleteVisitController 
-} from "../controllers/visit.controller";
+import { getVaccines,  getByIdVaccine } from "../controllers/vaccine.controller";
+import { Request, Response } from "express";
 
 const router = Router();
 
-router.get("/", getVisits);
-router.get("/:id", getByIdVisit);
-router.post("/", createVisitController);
-router.put("/:id", updateVisitController);
-router.delete("/:id", deleteVisitController);
+console.info('cc')
+
+
+export const updateAnimalController = async (req: Request, res: Response) => {
+res.send('ok' );
+}
+
+router.get("/", updateAnimalController);
+router.get("/:id", getByIdVaccine);
+// router.post("/", createVaccineController);
+// router.put("/:id", updateVaccineController);
+// router.delete("/:id", deleteVaccineController);
 
 export default router;
