@@ -68,16 +68,13 @@ export const updateUser = async (
   userId: number,
   data: {
     email?: string;
-    passwordHash?: string | undefined;
-    userRole?: user_role;
+    passwordHash?: string;
   }
 ) => {
   return prisma.user.update({
     where: { userId },
     data: {
-      email: data.email,
-      passwordHash: data.passwordHash,
-      userRole: data.userRole,
+      ...data,
       updatedAt: new Date(), // Mise à jour automatique du timestamp
     },
     select: {

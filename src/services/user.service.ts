@@ -83,31 +83,22 @@ export const fetchByIdUser = async (userId: number) => {
 // update
 export const updateUserById = async (userId: number, userData: UpdateUserDTO) => {
   try {
-    // 1. Vérifier que l'utilisateur existe
     const existingUser = await userRepo.getByIdUser(userId);
     if (!existingUser) {
       throw new Error("User not found");
     }
 
-    // 2. Préparer les données à mettre à jour
     const updateData: {
-      email: string;
-      passwordHash?: string | undefined;
-      userRole: typeof userData.userRole;
-    } = {
-      email: existingUser.email,
-      userRole: existingUser.userRole,
-    };
+      email?: string;
+      passwordHash?: string;
+    } = {};
 
-    // 3. Validation et gestion de l'email
     if (userData.email !== undefined) {
-      // Si l'email est fourni, on le valide
       const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(userData.email)) {
         throw new Error("Invalid email format");
       }
 
-      // Vérifier que l'email n'est pas déjà utilisé par un autre utilisateur
       const emailExists = await userRepo.getUserByEmail(userData.email);
       if (emailExists && emailExists.userId !== userId) {
         throw new Error("Email already exists");
@@ -116,9 +107,7 @@ export const updateUserById = async (userId: number, userData: UpdateUserDTO) =>
       updateData.email = userData.email;
     }
 
-    // 4. Gestion du mot de passe (IMPORTANT : ne change que s'il est fourni ET non vide)
     if (userData.password && userData.password.trim() !== "") {
-      // Validation : minimum 8 caractères
       if (userData.password.length < 8) {
         throw new Error("Password must be at least 8 characters long");
       }
@@ -128,14 +117,7 @@ export const updateUserById = async (userId: number, userData: UpdateUserDTO) =>
       const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
       updateData.passwordHash = hashedPassword;
     }
-    // Si password est absent, null, undefined ou vide → on ne touche PAS au password existant
 
-    // 5. Gestion du userRole
-    if (userData.userRole !== undefined) {
-      updateData.userRole = userData.userRole;
-    }
-
-    // 6. Mise à jour dans la base de données
     const updatedUser = await userRepo.updateUser(userId, updateData);
 
     return updatedUser;

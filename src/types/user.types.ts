@@ -7,8 +7,8 @@ export interface CreateUserDTO {
 }
 
 // Interface pour UPDATE - tous les champs sont optionnels (partial update)
+// Note: userRole n'est pas modifiable via PATCH pour le moment
 export interface UpdateUserDTO {
   email?: string;
   password?: string;
-  userRole?: user_role;
 }

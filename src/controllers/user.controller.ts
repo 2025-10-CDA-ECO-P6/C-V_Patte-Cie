@@ -144,7 +144,7 @@ export const postLogin = async (req: Request, res: Response) => {
 };
 
 // update
-export const putUser = async (req: Request, res: Response) => {
+export const patchUser = async (req: Request, res: Response) => {
   try {
     const userId = Number.parseInt(req.params.id);
 
@@ -163,7 +163,6 @@ export const putUser = async (req: Request, res: Response) => {
         id: updatedUser.userId,
         attributes: {
           email: updatedUser.email,
-          userRole: updatedUser.userRole,
           createdAt: updatedUser.createdAt,
           updatedAt: updatedUser.updatedAt,
           owner: updatedUser.owner,
