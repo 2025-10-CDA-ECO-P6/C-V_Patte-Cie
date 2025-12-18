@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, deleteUserById } from "../services/user.service";
-import { CreateUserDTO } from "../types/user.types";
+import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, updateUserById, deleteUserById } from "../services/user.service";
+import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
 
@@ -101,8 +101,6 @@ export const getByIdUser = async (req: Request, res: Response) => {
           userRole: user.userRole,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          owner: user.owner,
-          veterinarian: user.veterinarian,
         },
       },
     });
@@ -144,6 +142,53 @@ export const postLogin = async (req: Request, res: Response) => {
 };
 
 // update
+export const patchUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number.parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    const userData: UpdateUserDTO = req.body;
+
+    // Appel du service pour mettre à jour l'utilisateur
+    const updatedUser = await updateUserById(userId, userData);
+
+    // Format de réponse Strapi
+    res.status(200).json({
+      data: {
+        id: updatedUser.userId,
+        attributes: {
+          email: updatedUser.email,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    const errorMessage = (err as Error).message;
+
+    if (errorMessage.includes("User not found")) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (errorMessage.includes("Invalid email format")) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    if (errorMessage.includes("Email already exists")) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    if (errorMessage.includes("Password must be at least")) {
+      return res.status(400).json({ message: errorMessage });
+    }
+
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 // delete
 export const deleteUser = async (req: AuthRequest, res: Response) => {

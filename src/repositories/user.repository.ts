@@ -64,6 +64,28 @@ export const getUserByEmail = async (email: string) => {
 };
 
 // update
+export const updateUser = async (
+  userId: number,
+  data: {
+    email?: string;
+    passwordHash?: string;
+  }
+) => {
+  return prisma.user.update({
+    where: { userId },
+    data: {
+      ...data,
+      updatedAt: new Date(), // Mise à jour automatique du timestamp
+    },
+    select: {
+      userId: true,
+      email: true,
+      userRole: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
 
 // delete
 export const deleteUser = async (userId: number) => {

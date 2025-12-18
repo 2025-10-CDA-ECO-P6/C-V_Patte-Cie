@@ -1,5 +1,5 @@
 import * as userRepo from "../repositories/user.repository";
-import { CreateUserDTO } from "../types/user.types";
+import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { generateToken } from "../utils/jwt.utils";
 import bcrypt from 'bcrypt';
 
@@ -81,6 +81,50 @@ export const fetchByIdUser = async (userId: number) => {
 
 
 // update
+export const updateUserById = async (userId: number, userData: UpdateUserDTO) => {
+  try {
+    const existingUser = await userRepo.getByIdUser(userId);
+    if (!existingUser) {
+      throw new Error("User not found");
+    }
+
+    const updateData: {
+      email?: string;
+      passwordHash?: string;
+    } = {};
+
+    if (userData.email !== undefined) {
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(userData.email)) {
+        throw new Error("Invalid email format");
+      }
+
+      const emailExists = await userRepo.getUserByEmail(userData.email);
+      if (emailExists && emailExists.userId !== userId) {
+        throw new Error("Email already exists");
+      }
+
+      updateData.email = userData.email;
+    }
+
+    if (userData.password && userData.password.trim() !== "") {
+      if (userData.password.length < 8) {
+        throw new Error("Password must be at least 8 characters long");
+      }
+
+      // Hashing du nouveau mot de passe
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+      updateData.passwordHash = hashedPassword;
+    }
+
+    const updatedUser = await userRepo.updateUser(userId, updateData);
+
+    return updatedUser;
+  } catch (error) {
+    throw new Error("Error updating user: " + (error as Error).message);
+  }
+};
 
 // delete
 export const deleteUserById = async (userId: number) => {
