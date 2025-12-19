@@ -23,7 +23,7 @@ export const getVaccines = async (req: Request, res: Response) => {
     const pageSize = Number(req.query.pageSize) || 10;
 
     if (page <= 0 || pageSize <= 0) {
-      return res.status(400).json({ message: "Invalid pagination parameters" });
+      return res.status(400).json({ message: "Paramètres de pagination invalides" });
     }
 
     const { vaccines, total } = await fetchAllVaccines(page, pageSize);
@@ -43,7 +43,7 @@ export const getVaccines = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -54,12 +54,12 @@ export const getByIdVaccine = async (req: Request, res: Response) => {
     const vaccine = await fetchByIdVaccine(vaccineId);
     res.status(200).json(vaccine);
   } catch (error) {
-    if ((error as Error).message === "Vaccine not found") {
-      return res.status(404).json({ message: "Vaccine not found" });
+    if ((error as Error).message === "Vaccin non trouvé") {
+      return res.status(404).json({ message: "Vaccin non trouvé" });
     }
 
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -103,16 +103,16 @@ export const createVaccineController = async (req: Request, res: Response) => {
   } catch (error) {
     const message = (error as Error).message;
 
-    if (message === "Animal not found") {
+    if (message === "Animal non trouvé") {
       return res.status(404).json({ message });
     }
 
-    if (message === "Veterinarian not found") {
+    if (message === "Véterinaire non trouvé") {
       return res.status(404).json({ message });
     }
 
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -128,10 +128,10 @@ export const updateVaccineController = async (req: Request, res: Response) => {
   } catch (error) {
     const message = (error as Error).message;
 
-    if (message === "Vaccine not found") {
+    if (message === "Vaccin non trouvé") {
       return res.status(404).json({ message });
     }
-    if (message === "Animal not found" || message === "Veterinarian not found") {
+    if (message === "Animal non trouvé" || message === "Véterinaire non trouvé") {
       return res.status(404).json({ message });
     }
 
@@ -151,10 +151,10 @@ export const deleteVaccineController = async (req: Request, res: Response) => {
 
     const message = (error as Error).message;
 
-    if (message === "Vaccine not found") {
+    if (message === "Vaccin non trouvé") {
       return res.status(404).json({ message });
     }
 
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
