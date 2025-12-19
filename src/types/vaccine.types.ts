@@ -24,11 +24,11 @@ export type VaccineWithRelations = Prisma.VaccineGetPayload<{
 // Creat
 export interface VaccineInput {
   name: string;
-  administrationDate: Date;
+  administrationDate?: Date;
   vaccineStatus: VaccineStatus;
   reminderDelays: number[];
   animalId?: number;
-  veterinarianId: number;
+  veterinarianId?: number;
 }
 
 // Update

@@ -1,5 +1,6 @@
 import * as vaccineRepo from "../repositories/vaccine.repository";
 import { VaccineInput, VaccineUpdateInput, VaccineWithRelations } from "../types";
+import prisma from "../repositories/animal.repository";
 
 export const fetchAllVaccines = async ( page: number, pageSize: number) => {
   try {
@@ -17,4 +18,26 @@ export const fetchByIdVaccine = async (vaccineId: number) => {
   }
 
   return vaccine;
+};
+
+export const createVaccineService = async (data: VaccineInput) => {
+  if (data.animalId) {
+    const animal = await prisma.animal.findUnique({
+      where: { animalId: data.animalId },
+    });
+    if (!animal) {
+      throw new Error("Animal not found");
+    }
+  }
+
+  if (data.veterinarianId) {
+    const vet = await prisma.veterinarian.findUnique({
+      where: { veterinarianId: data.veterinarianId },
+    });
+    if (!vet) {
+      throw new Error("Veterinarian not found");
+    }
+  }
+
+  return vaccineRepo.createVaccine(data);
 };

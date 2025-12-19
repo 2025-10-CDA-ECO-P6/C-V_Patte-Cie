@@ -31,3 +31,13 @@ export const getByIdVaccine = async (vaccineId: number) => {
     },
   });
 };
+
+export const createVaccine = async (data: VaccineInput) => {
+  return prisma.vaccine.create({
+    data,
+    include: {
+      animal: true,
+      veterinarian: true,
+    },
+  });
+};
