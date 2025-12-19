@@ -14,7 +14,7 @@ export const fetchByIdVaccine = async (vaccineId: number) => {
   const vaccine = await vaccineRepo.getByIdVaccine(vaccineId);
 
   if (!vaccine) {
-    throw new Error("vaccine not found");
+    throw new Error("Vaccine not found");
   }
 
   return vaccine;
@@ -41,3 +41,19 @@ export const createVaccineService = async (data: VaccineInput) => {
 
   return vaccineRepo.createVaccine(data);
 };
+
+export const updateVaccineService = async (
+  vaccineId: number,
+  data: VaccineUpdateInput
+): Promise<VaccineWithRelations> => {
+
+  await fetchByIdVaccine(vaccineId); // Ensure vaccine exists
+ 
+  return vaccineRepo.updateVaccine(vaccineId, data);
+};
+
+export const deleteVaccine = async (vaccineId: number): Promise<void> => {
+  
+  await fetchByIdVaccine(vaccineId); // Ensure vaccine exists
+  await prisma.vaccine.delete({ where: { vaccineId } });
+}

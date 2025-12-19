@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { VaccineWithRelations } from "../types/vaccine.types";
-import { fetchAllVaccines, fetchByIdVaccine, createVaccineService } from "../services/vaccine.service";
+import { fetchAllVaccines, fetchByIdVaccine, createVaccineService, updateVaccineService, deleteVaccine } from "../services/vaccine.service";
 
 const formatVaccineResponse = (vaccine: VaccineWithRelations) => ({
  id: vaccine.vaccineId,
@@ -78,10 +78,6 @@ export const createVaccineController = async (req: Request, res: Response) => {
       veterinarianId,
     } = req.body;
 
-    if (!name || !vaccineStatus || !reminderDelays) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
     const vaccine = await createVaccineService({
       name,
       administrationDate: administrationDate
@@ -120,6 +116,56 @@ export const createVaccineController = async (req: Request, res: Response) => {
     }
 
     console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateVaccineController = async (req: Request, res: Response) => {
+  try {
+    const vaccineId = Number(req.params.id);
+    if (isNaN(vaccineId)) {
+      return res.status(400).json({ message: "ID de vaccin invalide" });
+    }
+
+    const updatedVaccine = await updateVaccineService(vaccineId, req.body);
+
+    res.status(200).json({
+      data: formatVaccineResponse(updatedVaccine),
+    });
+  } catch (error) {
+    const message = (error as Error).message;
+
+    if (message === "Vaccine not found") {
+      return res.status(404).json({ message });
+    }
+    if (message === "Animal not found" || message === "Veterinarian not found") {
+      return res.status(404).json({ message });
+    }
+
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+export const deleteVaccineController = async (req: Request, res: Response) => {
+  try {
+    const vaccineId = Number(req.params.id);
+
+    if (Number.isNaN(vaccineId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
+    await deleteVaccine(vaccineId);
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+
+    const message = (error as Error).message;
+
+    if (message === "Vaccine not found") {
+      return res.status(404).json({ message });
+    }
+
     res.status(500).json({ message: "Server error" });
   }
 };

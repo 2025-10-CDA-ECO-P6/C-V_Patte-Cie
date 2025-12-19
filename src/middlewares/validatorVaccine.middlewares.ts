@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
 
-export const createVaccineSchema = Joi.object({
+export const vaccineSchema = Joi.object({
   name: Joi.string()
     .max(100)
     .required()
@@ -73,9 +73,33 @@ export const validateCreateVaccine = (
   res: Response,
   next: NextFunction
 ) => {
-  const { error, value } = createVaccineSchema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true,
+  const { error, value } = vaccineSchema.validate(req.body, {
+    abortEarly: false, // renvoie toutes les erreurs, pas seulement la 1ère
+    stripUnknown: true, // supprime les champs qui ne sont pas définis dans le schema (evite les injections)
+  });
+
+  if (error) {
+    return res.status(400).json({
+      message: "Erreur de validation des données.",
+      errors: error.details.map((detail) => ({
+        field: detail.path.join("."),
+        message: detail.message,
+      })),
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+export const validateUpdateVaccine = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { error, value } = vaccineSchema.validate(req.body, {
+    abortEarly: false, 
+    stripUnknown: true, 
   });
 
   if (error) {

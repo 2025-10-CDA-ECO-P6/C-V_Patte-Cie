@@ -41,3 +41,27 @@ export const createVaccine = async (data: VaccineInput) => {
     },
   });
 };
+
+export const updateVaccine = async (
+  vaccineId: number,
+  data: VaccineUpdateInput
+) => {
+ const updatedVaccine = await prisma.vaccine.update({
+    where: { vaccineId },
+    data: {
+      ...data,
+      administrationDate: data.administrationDate ?? null,
+      animalId: data.animalId ?? null,
+      veterinarianId: data.veterinarianId ?? null,
+    },
+    include: { animal: true, veterinarian: true },
+  });
+
+  return updatedVaccine;
+};
+
+export const deleteVaccine = async (vaccineId: number) => {
+  return prisma.vaccine.delete({
+    where: { vaccineId },
+  });
+};
