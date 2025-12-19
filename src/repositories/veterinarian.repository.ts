@@ -25,7 +25,6 @@ export const getAllVets = async (page: number = 1, pageSize: number = 25) => {
         userId: true,
         name: true,
         phone: true,
-        address: true,
         createdAt: true,
         updatedAt: true,
         user: {
@@ -54,7 +53,6 @@ export const getByIdVet = async (vetId: number) => {
       userId: true,
       name: true,
       phone: true,
-      address: true,
       createdAt: true,
       updatedAt: true,
       user: {
@@ -76,7 +74,6 @@ export const getVetByUserId = async (userId: number) => {
       userId: true,
       name: true,
       phone: true,
-      address: true,
       createdAt: true,
       updatedAt: true,
       user: {
@@ -95,7 +92,6 @@ export const updateVet = async (
   data: {
     name?: string;
     phone?: string;
-    address?: string;
   }
 ) => {
   return prisma.veterinarian.update({
@@ -109,7 +105,6 @@ export const updateVet = async (
       userId: true,
       name: true,
       phone: true,
-      address: true,
       createdAt: true,
       updatedAt: true,
     },
