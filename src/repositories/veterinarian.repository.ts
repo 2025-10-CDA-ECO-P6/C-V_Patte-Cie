@@ -113,7 +113,15 @@ export const updateVet = async (
 };
 
 export const deleteVet = async (veterinarianId: string) => {
-  return prisma.veterinarian.delete({
-    where: { veterinarianId },
+  return prisma.$transaction(async (tx) => {
+    await tx.vaccine.deleteMany({
+      where: { veterinarianId },
+    });
+    await tx.visit.deleteMany({
+      where: { veterinarianId },
+    });
+    return tx.veterinarian.delete({
+      where: { veterinarianId },
+    });
   });
 };
