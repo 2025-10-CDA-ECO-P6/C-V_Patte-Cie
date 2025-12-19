@@ -33,16 +33,11 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAnimal = exports.fetchByIdAnimal = exports.fetchAllAnimals = void 0;
+exports.deleteAnimal = exports.updateAnimal = exports.createAnimal = exports.fetchByIdAnimal = exports.fetchAllAnimals = void 0;
 const animalRepo = __importStar(require("../repositories/animal.repository"));
-const fetchAllAnimals = async () => {
-    try {
-        const animals = await animalRepo.getAllAnimals();
-        return animals;
-    }
-    catch (error) {
-        throw new Error("Error fetching animals: " + error.message);
-    }
+const client_1 = require("@prisma/client");
+const fetchAllAnimals = async (page, pageSize) => {
+    return animalRepo.getAllAnimals(page, pageSize);
 };
 exports.fetchAllAnimals = fetchAllAnimals;
 const fetchByIdAnimal = async (animalId) => {
@@ -57,10 +52,31 @@ const fetchByIdAnimal = async (animalId) => {
 exports.fetchByIdAnimal = fetchByIdAnimal;
 const createAnimal = async (data) => {
     try {
-        return await animalRepo.createAnimal(data);
+        return await animalRepo.createAnimal({
+            ...data,
+            weight: new client_1.Prisma.Decimal(data.weight),
+        });
     }
     catch (error) {
         throw new Error("Error creating the animal: " + error.message);
     }
 };
 exports.createAnimal = createAnimal;
+const updateAnimal = async (animalId, data) => {
+    try {
+        return await animalRepo.updateAnimal(animalId, data);
+    }
+    catch (error) {
+        throw new Error("Error updating the animal: " + error.message);
+    }
+};
+exports.updateAnimal = updateAnimal;
+const deleteAnimal = async (animalId) => {
+    try {
+        return await animalRepo.deleteAnimal(animalId);
+    }
+    catch (error) {
+        throw new Error("Error deleting the animal: " + error.message);
+    }
+};
+exports.deleteAnimal = deleteAnimal;
