@@ -49,11 +49,7 @@ export const getVaccines = async (req: Request, res: Response) => {
 
 export const getByIdVaccine = async (req: Request, res: Response) => {
   try {
-    const vaccineId = Number(req.params.id);
-
-    if (isNaN(vaccineId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const vaccineId = req.params.id;
 
     const vaccine = await fetchByIdVaccine(vaccineId);
     res.status(200).json(vaccine);
@@ -85,8 +81,8 @@ export const createVaccineController = async (req: Request, res: Response) => {
         : undefined,
       vaccineStatus,
       reminderDelays,
-      animalId: animalId ? Number(animalId) : undefined,
-      veterinarianId: veterinarianId ? Number(veterinarianId) : undefined,
+      animalId: animalId ? animalId : undefined,
+      veterinarianId: veterinarianId ? veterinarianId : undefined,
     });
 
     res.status(201).json({
@@ -122,10 +118,7 @@ export const createVaccineController = async (req: Request, res: Response) => {
 
 export const updateVaccineController = async (req: Request, res: Response) => {
   try {
-    const vaccineId = Number(req.params.id);
-    if (isNaN(vaccineId)) {
-      return res.status(400).json({ message: "ID de vaccin invalide" });
-    }
+    const vaccineId = req.params.id;
 
     const updatedVaccine = await updateVaccineService(vaccineId, req.body);
 
@@ -149,11 +142,7 @@ export const updateVaccineController = async (req: Request, res: Response) => {
 
 export const deleteVaccineController = async (req: Request, res: Response) => {
   try {
-    const vaccineId = Number(req.params.id);
-
-    if (Number.isNaN(vaccineId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const vaccineId = req.params.id;
 
     await deleteVaccine(vaccineId);
     res.status(204).send();

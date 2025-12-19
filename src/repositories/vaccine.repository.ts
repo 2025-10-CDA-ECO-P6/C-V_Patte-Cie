@@ -22,7 +22,7 @@ export const getAllVaccines = async (page: number, pageSize: number) => {
   return { vaccines, total };
 };
 
-export const getByIdVaccine = async (vaccineId: number) => {
+export const getByIdVaccine = async (vaccineId: string) => {
   return prisma.vaccine.findUnique({
     where: { vaccineId },
     include: {
@@ -43,7 +43,7 @@ export const createVaccine = async (data: VaccineInput) => {
 };
 
 export const updateVaccine = async (
-  vaccineId: number,
+  vaccineId: string,
   data: VaccineUpdateInput
 ) => {
  const updatedVaccine = await prisma.vaccine.update({
@@ -60,7 +60,7 @@ export const updateVaccine = async (
   return updatedVaccine;
 };
 
-export const deleteVaccine = async (vaccineId: number) => {
+export const deleteVaccine = async (vaccineId: string) => {
   return prisma.vaccine.delete({
     where: { vaccineId },
   });

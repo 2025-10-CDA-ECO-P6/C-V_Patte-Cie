@@ -3,13 +3,13 @@ import { Prisma } from "@prisma/client";
 export type VaccineStatus = "pending" | "administered" | "expired";
 
 export interface Vaccine {
-  vaccineId: number;
+  vaccineId: string;
   name: string;
   administrationDate?: Date |null;
   vaccineStatus: VaccineStatus;
   reminderDelays: number[];
   veterinarianId?: number | null;
-  animalId?: number;
+  animalId?: string | null;
   updatedAt: Date | null;
   createdAt: Date | null;
 }
@@ -27,8 +27,8 @@ export interface VaccineInput {
   administrationDate?: Date;
   vaccineStatus: VaccineStatus;
   reminderDelays: number[];
-  animalId?: number;
-  veterinarianId?: number;
+  animalId?: string | null;
+  veterinarianId?: string | null;
 }
 
 // Update

@@ -47,25 +47,21 @@ export const vaccineSchema = Joi.object({
       "any.required": "Les délais de rappel sont obligatoires.",
     }),
 
-  animalId: Joi.number()
-    .integer()
-    .positive()
+  animalId: Joi.string()
+    .uuid()
     .optional()
     .messages({
-      "number.base": "L’identifiant de l’animal doit être un nombre.",
-      "number.integer": "L’identifiant de l’animal doit être un entier.",
-      "number.positive": "L’identifiant de l’animal doit être positif.",
-    }),
+    "string.base": "L’identifiant de l’animal doit être une chaîne de caractères.",
+    "string.guid": "L’identifiant de l’animal doit être un UUID valide.",
+  }),
 
-  veterinarianId: Joi.number()
-    .integer()
-    .positive()
-    .optional()
-    .messages({
-      "number.base": "L’identifiant du vétérinaire doit être un nombre.",
-      "number.integer": "L’identifiant du vétérinaire doit être un entier.",
-      "number.positive": "L’identifiant du vétérinaire doit être positif.",
-    }),
+veterinarianId: Joi.string()
+  .uuid()
+  .optional()
+  .messages({
+    "string.base": "L’identifiant du vétérinaire doit être une chaîne de caractères.",
+    "string.guid": "L’identifiant du vétérinaire doit être un UUID valide.",
+  }),
 }).unknown(false);
 
 export const validateCreateVaccine = (
