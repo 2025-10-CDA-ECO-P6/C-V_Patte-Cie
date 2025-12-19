@@ -1,4 +1,5 @@
 import { PrismaClient, visit_status } from "@prisma/client";
+import { randomUUID } from "crypto";
 import { VisitInput, VisitUpdateInput } from "../types";
 
 const prisma = new PrismaClient();
@@ -38,6 +39,7 @@ export const getByIdVisit = async (visitId: string) => {
 export const createVisit = async (data: VisitInput) => {
   return prisma.visit.create({
     data: {
+      visitId: randomUUID(),
       date: data.date,
       reason: data.reason,
       visitStatus: data.visitStatus as visit_status,

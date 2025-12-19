@@ -2,7 +2,7 @@ import * as userRepo from "../repositories/user.repository";
 import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { generateToken } from "../utils/jwt.utils";
 import bcrypt from 'bcrypt';
-import "../types/errorException";
+import ErrorException from "../types/errorException";
 
 // login
 export const loginUser = async (email: string, password: string) => {

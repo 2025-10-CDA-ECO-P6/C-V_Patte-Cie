@@ -1,5 +1,6 @@
 import express from "express";
 import routes from "./routes";
+import "./types/errorException"; // Import pour rendre ErrorException disponible globalement
 
 const app = express();
 

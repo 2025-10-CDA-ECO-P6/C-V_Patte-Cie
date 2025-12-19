@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, updateUserById, deleteUserById } from "../services/user.service";
 import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { AuthRequest } from "../middlewares/auth.middleware";
-import "../types/errorException";
+import ErrorException from "../types/errorException";
+import { isValidUUID } from "../utils/uuid";
 
 
 // create
@@ -79,6 +80,10 @@ export const getByIdUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
 
+    if (!isValidUUID(userId)) {
+      throw new ErrorException(400, "Invalid user ID");
+    }
+
     const user = await fetchByIdUser(userId);
 
     // Format de réponse Strapi
@@ -129,6 +134,10 @@ export const patchUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
 
+    if (!isValidUUID(userId)) {
+      throw new ErrorException(400, "Invalid user ID");
+    }
+
     const userData: UpdateUserDTO = req.body;
 
     // Appel du service pour mettre à jour l'utilisateur
@@ -158,6 +167,10 @@ export const patchUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.id;
+
+    if (!isValidUUID(userId)) {
+      throw new ErrorException(400, "Invalid user ID");
+    }
 
     // Récupérer l'utilisateur avant suppression pour le retourner (convention Strapi)
     const user = await fetchByIdUser(userId);
