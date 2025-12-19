@@ -66,7 +66,7 @@ export const fetchAllUsers = async (page: number = 1, pageSize: number = 25) => 
   }
 };
 // read by ID
-export const fetchByIdUser = async (userId: number) => {
+export const fetchByIdUser = async (userId: string) => {
   const user = await userRepo.getByIdUser(userId);
 
   if (!user) {
@@ -78,7 +78,7 @@ export const fetchByIdUser = async (userId: number) => {
 
 
 // update
-export const updateUserById = async (userId: number, userData: UpdateUserDTO) => {
+export const updateUserById = async (userId: string, userData: UpdateUserDTO) => {
   const existingUser = await userRepo.getByIdUser(userId);
   if (!existingUser) {
     throw new ErrorException(404, "User not found");
@@ -120,7 +120,7 @@ export const updateUserById = async (userId: number, userData: UpdateUserDTO) =>
 };
 
 // delete
-export const deleteUserById = async (userId: number) => {
+export const deleteUserById = async (userId: string) => {
   const user = await userRepo.getByIdUser(userId);
 
   if (!user) {

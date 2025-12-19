@@ -49,11 +49,7 @@ export const getVisits = async (req: Request, res: Response) => {
 
 export const getByIdVisit = async (req: Request, res: Response) => {
   try {
-    const visitId = Number(req.params.id);
-
-    if (isNaN(visitId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const visitId = req.params.id;
 
     const visit = await fetchByIdVisit(visitId);
     res.status(200).json(visit);
@@ -75,7 +71,7 @@ export const createVisitController = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const animal = await fetchByIdAnimal(Number(animalId));
+    const animal = await fetchByIdAnimal(animalId);
     if (!animal) {
       return res.status(404).json({ message: `Animal with id ${animalId} not found` });
     }
@@ -91,8 +87,8 @@ export const createVisitController = async (req: Request, res: Response) => {
       reason,
       visitStatus,
       observation: observation ?? null,
-      animalId: Number(animalId),
-      veterinarianId: Number(veterinarianId),
+      animalId: animalId,
+      veterinarianId: veterinarianId,
     };
 
     const visit = await createVisit(visitData);
@@ -105,8 +101,8 @@ export const createVisitController = async (req: Request, res: Response) => {
           reason: visit.reason,
           visitStatus: visit.visitStatus,
           observation: visit.observation,
-          animal: visit.animal,
-          veterinarian: visit.veterinarian,
+          animalId: visit.animalId,
+          veterinarianId: visit.veterinarianId,
         },
       },
     });
@@ -117,11 +113,7 @@ export const createVisitController = async (req: Request, res: Response) => {
 };
 export const updateVisitController = async (req: Request, res: Response) => {
   try {
-    const visitId = Number(req.params.id);
-
-    if (Number.isNaN(visitId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const visitId = req.params.id;
 
     const existingVisit = await fetchByIdVisit(visitId);
     if (!existingVisit) {
@@ -142,8 +134,8 @@ export const updateVisitController = async (req: Request, res: Response) => {
       ...(reason && { reason }),
       ...(visitStatus && { visitStatus: visitStatus as VisitStatus }),
       ...(observation !== undefined && { observation }),
-      ...(animalId && { animalId: Number(animalId) }),
-      ...(veterinarianId && { veterinarianId: Number(veterinarianId) }),
+      ...(animalId && { animalId: animalId }),
+      ...(veterinarianId && { veterinarianId: veterinarianId }),
     };
 
     const updatedVisit = await updateVisit(visitId, visitData);
@@ -164,11 +156,7 @@ export const updateVisitController = async (req: Request, res: Response) => {
 
 export const deleteVisitController = async (req: Request, res: Response) => {
   try {
-    const visitId = Number(req.params.id);
-
-    if (Number.isNaN(visitId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const visitId = req.params.id;
 
     await deleteVisit(visitId);
     res.status(204).send();

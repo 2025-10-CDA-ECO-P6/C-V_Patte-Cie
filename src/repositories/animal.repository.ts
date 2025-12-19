@@ -28,7 +28,7 @@ export const getAllAnimals = async (page: number, pageSize: number) => {
   return { animals, total };
 };
 
-export const getByIdAnimal = async (animalId: number) => {
+export const getByIdAnimal = async (animalId: string) => {
   return prisma.animal.findFirst({
     where: { animalId: animalId },
     include: {
@@ -62,7 +62,7 @@ export const createAnimal = async (data: AnimalInput) => {
 };
 
 export const updateAnimal = async (
-  animalId: number,
+  animalId: string,
   data: AnimalUpdateInput
 ) => {
   const { ownerId, ...otherData } = data;
@@ -81,7 +81,7 @@ export const updateAnimal = async (
   });
 };
 
-export const deleteAnimal = async (animalId: number) => {
+export const deleteAnimal = async (animalId: string) => {
   return prisma.animal.delete({
     where: { animalId },
   });

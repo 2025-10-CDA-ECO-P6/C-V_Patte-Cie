@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  userId       Int           @id @default(autoincrement()) @map("user_id")
+  userId       String        @id @default(uuid()) @map("user_id") @db.Uuid
   email        String        @unique @db.VarChar(100)
   passwordHash String        @map("password_hash") @db.VarChar(255)
   userRole     user_role     @map("user_role")
@@ -21,8 +21,8 @@ model User {
 }
 
 model Owner {
-  ownerId   Int       @id @default(autoincrement()) @map("owner_id")
-  userId    Int       @unique @map("user_id")
+  ownerId   String    @id @default(uuid()) @map("owner_id") @db.Uuid
+  userId    String    @unique @map("user_id") @db.Uuid
   name      String    @db.VarChar(100)
   phone     String    @db.VarChar(25)
   address   String    @db.VarChar(255)
@@ -35,21 +35,21 @@ model Owner {
 }
 
 model Veterinarian {
-  veterinarianId Int       @id @default(autoincrement()) @map("veterinarian_id")
-  userId         Int       @unique @map("user_id")
-  name           String    @db.VarChar(100)
-  phone          String    @db.VarChar(25)
-  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt      DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  veterinarianId String       @id @default(uuid()) @map("veterinarian_id") @db.Uuid
+  userId         String       @unique @map("user_id") @db.Uuid
+  name           String       @db.VarChar(100)
+  phone          String       @db.VarChar(25)
+  createdAt      DateTime?    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime?    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   vaccines       Vaccine[]
-  user           User      @relation(fields: [userId], references: [userId], onDelete: Cascade, map: "fk_veterinarian_user")
+  user           User         @relation(fields: [userId], references: [userId], onDelete: Cascade, map: "fk_veterinarian_user")
   visits         Visit[]
 
   @@map("veterinarian")
 }
 
 model Animal {
-  animalId    Int       @id @default(autoincrement()) @map("animal_id")
+  animalId    String    @id @default(uuid()) @map("animal_id") @db.Uuid
   name        String    @db.VarChar(100)
   species     String    @db.VarChar(50)
   breed       String    @db.VarChar(100)
@@ -57,7 +57,7 @@ model Animal {
   picture     String?   @db.VarChar(255)
   weight      Decimal   @db.Decimal(6, 2)
   gender      String    @db.Char(1)
-  ownerId     Int       @map("owner_id")
+  ownerId     String    @map("owner_id") @db.Uuid
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   owner       Owner     @relation(fields: [ownerId], references: [ownerId], onDelete: Cascade, map: "fk_animal_owner")
@@ -71,13 +71,13 @@ model Animal {
 }
 
 model Visit {
-  visitId        Int          @id @default(autoincrement()) @map("visit_id")
+  visitId        String       @id @default(uuid()) @map("visit_id") @db.Uuid
   date           DateTime     @db.Timestamp(6)
   reason         String
   visitStatus    visit_status @map("visit_status")
   observation    String?
-  animalId       Int          @map("animal_id")
-  veterinarianId Int          @map("veterinarian_id")
+  animalId       String       @map("animal_id") @db.Uuid
+  veterinarianId String       @map("veterinarian_id") @db.Uuid
   createdAt      DateTime?    @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt      DateTime?    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   animal         Animal       @relation(fields: [animalId], references: [animalId], onDelete: Cascade, map: "fk_visit_animal")
@@ -91,17 +91,17 @@ model Visit {
 }
 
 model Vaccine {
-  vaccineId          Int            @id @default(autoincrement()) @map("vaccine_id")
-  name               String         @db.VarChar(100)
-  administrationDate DateTime?      @map("administration_date") @db.Date
+  vaccineId          String        @id @default(uuid()) @map("vaccine_id") @db.Uuid
+  name               String        @db.VarChar(100)
+  administrationDate DateTime?     @map("administration_date") @db.Date
   vaccineStatus      vaccine_status @map("vaccine_status")
-  reminderDelays     Int[]          @map("reminder_delays")
-  veterinarianId     Int?           @map("veterinarian_id")
-  animalId           Int?           @map("animal_id")
-  createdAt          DateTime?      @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt          DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  animal             Animal?        @relation(fields: [animalId], references: [animalId], map: "fk_vaccine_animal")
-  veterinarian       Veterinarian?  @relation(fields: [veterinarianId], references: [veterinarianId], map: "fk_vaccine_veterinarian")
+  reminderDelays     Int[]         @map("reminder_delays")
+  veterinarianId     String?       @map("veterinarian_id") @db.Uuid
+  animalId           String?       @map("animal_id") @db.Uuid
+  createdAt          DateTime?     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt          DateTime?     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  animal             Animal?       @relation(fields: [animalId], references: [animalId], map: "fk_vaccine_animal")
+  veterinarian       Veterinarian? @relation(fields: [veterinarianId], references: [veterinarianId], map: "fk_vaccine_veterinarian")
 
   @@index([animalId], map: "idx_vaccine_animal")
   @@index([veterinarianId], map: "idx_vaccine_veterinarian")
