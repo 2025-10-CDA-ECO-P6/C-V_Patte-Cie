@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, updateUserById, deleteUserById } from "../services/user.service";
 import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { AuthRequest } from "../middlewares/auth.middleware";
-import "../types/errorException";
+import ErrorException from "../types/errorException";
 import { isValidUUID } from "../utils/uuid";
 
 

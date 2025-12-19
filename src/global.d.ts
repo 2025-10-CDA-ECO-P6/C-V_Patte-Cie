@@ -1,4 +1,8 @@
-declare class ErrorException extends Error {
-    status: number;
-    constructor(status: number, message?: string);
+declare global {
+    class ErrorException extends Error {
+        status: number;
+        constructor(status: number, message?: string);
+    }
 }
+
+export {};

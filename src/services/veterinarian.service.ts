@@ -1,7 +1,7 @@
 import * as vetRepo from "../repositories/veterinarian.repository";
 import * as userRepo from "../repositories/user.repository";
 import { CreateVeterinarianDTO, UpdateVeterinarianDTO } from "../types/veterinarian.type";
-import "../types/errorException";
+import ErrorException from "../types/errorException";
 
 export const createNewVet = async (vetData: CreateVeterinarianDTO) => {
   // Vérifier que l'utilisateur existe

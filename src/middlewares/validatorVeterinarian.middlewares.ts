@@ -69,7 +69,7 @@ export const validateCreateVeterinarian = (
   if (error) {
     return res.status(400).json({
       message: "Erreur de validation des données.",
-      errors: error.details.map((detail) => ({
+      errors: error.details.map((detail: Joi.ValidationErrorItem) => ({
         field: detail.path.join("."),
         message: detail.message,
       })),
@@ -93,7 +93,7 @@ export const validateUpdateVeterinarian = (
   if (error) {
     return res.status(400).json({
       message: "Erreur de validation des données.",
-      errors: error.details.map((detail) => ({
+      errors: error.details.map((detail: Joi.ValidationErrorItem) => ({
         field: detail.path.join("."),
         message: detail.message,
       })),

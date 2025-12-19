@@ -9,7 +9,7 @@ import {
   fetchOwnerByUserId,
 } from "../services/owner.service";
 import { CreateOwnerDTO, UpdateOwnerDTO } from "../types/owner.types";
-import "../types/errorException";
+import ErrorException from "../types/errorException";
 
 export const postOwner = async (req: Request, res: Response) => {
   try {

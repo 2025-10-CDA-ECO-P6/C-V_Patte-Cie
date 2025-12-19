@@ -8,7 +8,7 @@ import {
   fetchVetByUserId,
 } from "../services/veterinarian.service";
 import { CreateVeterinarianDTO, UpdateVeterinarianDTO } from "../types/veterinarian.type";
-import "../types/errorException";
+import ErrorException from "../types/errorException";
 import { isValidUUID } from "../utils/uuid";
 
 export const postVet = async (req: Request, res: Response) => {

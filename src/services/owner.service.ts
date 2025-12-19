@@ -1,7 +1,7 @@
 import * as ownerRepo from "../repositories/owner.repository";
 import * as userRepo from "../repositories/user.repository";
 import { CreateOwnerDTO, UpdateOwnerDTO } from "../types/owner.types";
-import "../types/errorException";
+import ErrorException from "../types/errorException";
 
 export const createNewOwner = async (ownerData: CreateOwnerDTO) => {
   const user = await userRepo.getByIdUser(ownerData.userId);
