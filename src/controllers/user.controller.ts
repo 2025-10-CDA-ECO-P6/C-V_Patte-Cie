@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, deleteUserById } from "../services/user.service";
-import { CreateUserDTO } from "../types/user.types";
+import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, updateUserById, deleteUserById } from "../services/user.service";
+import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import "../types/errorException";
 
 
 // create
@@ -22,20 +23,9 @@ export const postUser = async (req: Request, res: Response) => {
         },
       },
     });
-  } catch (err) {
-    console.error(err);
-    const errorMessage = (err as Error).message;
-
-    if (errorMessage.includes("Invalid email format")) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
-
-    if (errorMessage.includes("Password must be at least")) {
-      return res.status(400).json({ message: errorMessage });
-    }
-
-    if (errorMessage.includes("Email already exists")) {
-      return res.status(409).json({ message: "Email already exists" });
+  } catch (err: any) {
+    if (err instanceof ErrorException) {
+      return res.status(err.status).json({ message: err.message });
     }
 
     res.status(500).json({ message: "Erreur serveur" });
@@ -75,8 +65,11 @@ export const getUsers = async (req: Request, res: Response) => {
         },
       },
     });
-  } catch (err) {
-    console.error(err);
+  } catch (err: any) {
+    if (err instanceof ErrorException) {
+      return res.status(err.status).json({ message: err.message });
+    }
+
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
@@ -87,7 +80,7 @@ export const getByIdUser = async (req: Request, res: Response) => {
     const userId = Number.parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
+      throw new ErrorException(400, "Invalid user ID");
     }
 
     const user = await fetchByIdUser(userId);
@@ -101,17 +94,12 @@ export const getByIdUser = async (req: Request, res: Response) => {
           userRole: user.userRole,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          owner: user.owner,
-          veterinarian: user.veterinarian,
         },
       },
     });
-  } catch (err) {
-    console.error(err);
-    const errorMessage = (err as Error).message;
-
-    if (errorMessage.includes("User not found")) {
-      return res.status(404).json({ message: "User not found" });
+  } catch (err: any) {
+    if (err instanceof ErrorException) {
+      return res.status(err.status).json({ message: err.message });
     }
 
     res.status(500).json({ message: "Erreur serveur" });
@@ -124,19 +112,16 @@ export const postLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      throw new ErrorException(400, "Email and password are required");
     }
 
     const token = await loginUser(email, password);
     res.status(200).json({
       accessToken: token
     });
-  } catch (err) {
-    console.error(err);
-    const errorMessage = (err as Error).message;
-
-    if (errorMessage.includes("Invalid credentials")) {
-      return res.status(401).json({ message: "Invalid credentials" });
+  } catch (err: any) {
+    if (err instanceof ErrorException) {
+      return res.status(err.status).json({ message: err.message });
     }
 
     res.status(500).json({ message: "Erreur serveur" });
@@ -144,6 +129,38 @@ export const postLogin = async (req: Request, res: Response) => {
 };
 
 // update
+export const patchUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number.parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      throw new ErrorException(400, "Invalid user ID");
+    }
+
+    const userData: UpdateUserDTO = req.body;
+
+    // Appel du service pour mettre à jour l'utilisateur
+    const updatedUser = await updateUserById(userId, userData);
+
+    // Format de réponse Strapi
+    res.status(200).json({
+      data: {
+        id: updatedUser.userId,
+        attributes: {
+          email: updatedUser.email,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt
+        },
+      },
+    });
+  } catch (err: any) {
+    if (err instanceof ErrorException) {
+      return res.status(err.status).json({ message: err.message });
+    }
+
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 // delete
 export const deleteUser = async (req: AuthRequest, res: Response) => {
@@ -151,14 +168,11 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
     const userId = Number.parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
+      throw new ErrorException(400, "Invalid user ID");
     }
 
     // Récupérer l'utilisateur avant suppression pour le retourner (convention Strapi)
     const user = await fetchByIdUser(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
     await deleteUserById(userId);
 
@@ -176,12 +190,9 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
         },
       },
     });
-  } catch (err) {
-    console.error(err);
-    const errorMessage = (err as Error).message;
-
-    if (errorMessage.includes("User not found")) {
-      return res.status(404).json({ message: "User not found" });
+  } catch (err: any) {
+    if (err instanceof ErrorException) {
+      return res.status(err.status).json({ message: err.message });
     }
 
     res.status(500).json({ message: "Erreur serveur" });
