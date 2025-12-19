@@ -25,7 +25,7 @@ export const getAllVisits = async (page: number, pageSize: number) => {
 };
 
 
-export const getByIdVisit = async (visitId: number) => {
+export const getByIdVisit = async (visitId: string) => {
   return prisma.visit.findUnique({
     where: { visitId },
     include: {
@@ -57,7 +57,7 @@ export const createVisit = async (data: VisitInput) => {
 };
 
 export const updateVisit = async (
-  visitId: number,
+  visitId: string,
   data: VisitUpdateInput
 ) => {
   const { animalId, veterinarianId, ...otherData } = data;
@@ -80,7 +80,7 @@ export const updateVisit = async (
   });
 };
 
-export const deleteVisit = async (visitId: number) => {
+export const deleteVisit = async (visitId: string) => {
   return prisma.visit.delete({
     where: { visitId },
   });

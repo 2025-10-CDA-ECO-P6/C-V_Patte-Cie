@@ -58,11 +58,7 @@ export const getAnimals = async (req: Request, res: Response) => {
 
 export const getByIdAnimalController = async (req: Request, res: Response) => {
   try {
-    const animalId = Number(req.params.id);
-
-    if (Number.isNaN(animalId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const animalId = req.params.id;
 
     const animal = await fetchByIdAnimal(animalId);
 
@@ -122,7 +118,7 @@ export const createAnimalController = async (req: Request, res: Response) => {
       picture: picture ?? null,
       weight,
       gender,
-      ownerId: Number(ownerId),
+      ownerId: ownerId,
     };
 
     const animal = await createAnimal(animalData);
@@ -143,7 +139,7 @@ export const createAnimalController = async (req: Request, res: Response) => {
 
 export const updateAnimalController = async (req: Request, res: Response) => {
   try {
-    const animalId = Number(req.params.id);
+    const animalId = req.params.id;
 
     if (Number.isNaN(animalId)) {
       return res.status(400).json({ message: "Invalid ID" });
@@ -190,11 +186,7 @@ export const updateAnimalController = async (req: Request, res: Response) => {
 
 export const deleteAnimalController = async (req: Request, res: Response) => {
   try {
-    const animalId = Number(req.params.id);
-
-    if (Number.isNaN(animalId)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
+    const animalId = req.params.id;
 
     await deleteAnimal(animalId);
     res.status(204).send();

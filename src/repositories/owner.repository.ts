@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const createOwner = async (ownerData: {
-  userId: number;
+  userId: string;
   name: string;
   phone: string;
   address: string;
@@ -46,7 +46,7 @@ export const getAllOwners = async (page: number = 1, pageSize: number = 25) => {
   };
 };
 
-export const getByIdOwner = async (ownerId: number) => {
+export const getByIdOwner = async (ownerId: string) => {
   return prisma.owner.findUnique({
     where: { ownerId },
     select: {
@@ -68,7 +68,7 @@ export const getByIdOwner = async (ownerId: number) => {
   });
 };
 
-export const getOwnerByUserId = async (userId: number) => {
+export const getOwnerByUserId = async (userId: string) => {
   return prisma.owner.findUnique({
     where: { userId },
     select: {
@@ -91,7 +91,7 @@ export const getOwnerByUserId = async (userId: number) => {
 };
 
 export const updateOwner = async (
-  ownerId: number,
+  ownerId: string,
   data: {
     name?: string;
     phone?: string;
@@ -116,7 +116,7 @@ export const updateOwner = async (
   });
 };
 
-export const deleteOwner = async (ownerId: number) => {
+export const deleteOwner = async (ownerId: string) => {
   return prisma.$transaction(async (tx) => {
     await tx.animal.deleteMany({
       where: { ownerId },

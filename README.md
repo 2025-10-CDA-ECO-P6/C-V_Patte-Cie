@@ -73,12 +73,19 @@ La base PostgreSQL (Neon.tech) comprend :
 - `visit` - Visites vétérinaires
 - `vaccine` - Vaccinations
 
-### Réinitialiser la base
+
+### Réinitialiser et synchroniser la base
+> ⚠️ **Attention :** cette opération supprime toutes les données existantes.
+
 ```bash
-# Synchroniser Prisma
-npx prisma db pull
+# Réinitialiser la base de données de développement
+npx prisma migrate reset
+
+# Synchroniser le client Prisma
 npx prisma generate
-```
+
+# Remplir la base avec des données de test
+npx prisma db seed
 
 ### Explorer la base
 ```bash

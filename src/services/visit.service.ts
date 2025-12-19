@@ -10,7 +10,7 @@ export const fetchAllVisits = async ( page: number, pageSize: number) => {
   }
 };
 
-export const fetchByIdVisit = async (visitId: number) => {
+export const fetchByIdVisit = async (visitId: string) => {
   const visit = await visitRepo.getByIdVisit(visitId);
 
   if (!visit) {
@@ -31,7 +31,7 @@ export const createVisit = async (data: VisitInput) => {
 };
 
 export const updateVisit = async (
-  visitId: number,
+  visitId: string,
   data: VisitUpdateInput
 ) => {
   try {
@@ -43,7 +43,7 @@ export const updateVisit = async (
   }
 };
 
-export const deleteVisit = async (visitId: number) => {
+export const deleteVisit = async (visitId: string) => {
   try {
     return await visitRepo.deleteVisit(visitId);
   } catch (error) {

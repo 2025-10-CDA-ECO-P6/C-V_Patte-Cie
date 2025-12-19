@@ -9,7 +9,7 @@ export const fetchAllAnimals = async (
   return animalRepo.getAllAnimals(page, pageSize);
 };
 
-export const fetchByIdAnimal = async (animalId: number) => {
+export const fetchByIdAnimal = async (animalId: string) => {
   try {
     const animal = await animalRepo.getByIdAnimal(animalId);
     return animal;
@@ -29,7 +29,7 @@ export const createAnimal = async (data: AnimalInput): Promise<AnimalWithRelatio
   }
 };
 
-export const updateAnimal = async (animalId: number, data: AnimalUpdateInput) => {
+export const updateAnimal = async (animalId: string, data: AnimalUpdateInput) => {
   try {
     return await animalRepo.updateAnimal(animalId, data);
   } catch (error) {
@@ -37,7 +37,7 @@ export const updateAnimal = async (animalId: number, data: AnimalUpdateInput) =>
   }
 };
 
-export const deleteAnimal = async (animalId: number) => {
+export const deleteAnimal = async (animalId: string) => {
   try {
     return await animalRepo.deleteAnimal(animalId);
   } catch (error) {

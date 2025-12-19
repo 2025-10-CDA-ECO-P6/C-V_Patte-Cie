@@ -41,9 +41,9 @@ export const getAllUsers = async (page: number = 1, pageSize: number = 25) => {
 };
 
 //read by ID
-export const getByIdUser = async (userId: number) => {
+export const getByIdUser = async (userId: string) => {
   return prisma.user.findUnique({
-    where: { userId: userId },
+    where: { userId},
     select: {
       userId: true,
       email: true,
@@ -65,7 +65,7 @@ export const getUserByEmail = async (email: string) => {
 
 // update
 export const updateUser = async (
-  userId: number,
+  userId: string,
   data: {
     email?: string;
     passwordHash?: string;
@@ -88,7 +88,7 @@ export const updateUser = async (
 };
 
 // delete
-export const deleteUser = async (userId: number) => {
+export const deleteUser = async (userId: string) => {
   return prisma.$transaction(async (tx) => {
     const owner = await tx.owner.findUnique({
       where: { userId: userId },

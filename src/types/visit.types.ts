@@ -3,12 +3,12 @@ import { Prisma } from "@prisma/client";
 export type VisitStatus = "scheduled" | "completed" | "cancelled";
 
 export interface Visit {
-  visitId: number;
+  visitId: string;
   date: Date;
   reason: string;
   visitStatus: VisitStatus;
   observation: string | null;
-  animalId: number;
+  animalId: string;
   veterinarianId: number;
   createdAt: Date | null;
   updatedAt: Date | null;
@@ -27,8 +27,8 @@ export interface VisitInput {
   reason: string;
   visitStatus: VisitStatus;
   observation?: string | null;
-  animalId: number;
-  veterinarianId: number;
+  animalId: string;
+  veterinarianId: string;
 }
 
 // Update

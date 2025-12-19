@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 export type Gender = "M" | "F";
 
 export interface Animal {
-  animalId: number;
+  animalId: string;
   name: string;
   species: string;
   breed: string;
@@ -11,7 +11,7 @@ export interface Animal {
   picture: string | null;
   weight: Prisma.Decimal;  
   gender: Gender;
-  ownerId: number;
+  ownerId: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -32,7 +32,7 @@ export interface AnimalInput {
   picture?: string | null ;
   weight: number | string | Prisma.Decimal; 
   gender: Gender;
-  ownerId: number;
+  ownerId: string;
 }
 
 export type AnimalUpdateInput = Partial<AnimalInput>;
