@@ -1,5 +1,5 @@
 export interface CreateVeterinarianDTO {
-  userId: number;
+  userId: string; // UUID
   name: string;
   phone: string;
 }

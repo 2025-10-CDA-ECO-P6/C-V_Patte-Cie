@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { randomUUID } from "crypto";
 const prisma = new PrismaClient();
 
 export const createOwner = async (ownerData: {
@@ -9,7 +10,7 @@ export const createOwner = async (ownerData: {
   createdAt: Date;
 }) => {
   return prisma.owner.create({
-    data: ownerData,
+    data: { ownerId: randomUUID(), ...ownerData },
   });
 };
 

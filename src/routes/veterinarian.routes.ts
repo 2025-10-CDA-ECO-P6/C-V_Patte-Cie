@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { getVets, getByIdVet, postVet, patchVet, deleteVet } from "../controllers/owner.controller";
+import { getVets, getByIdVet, postVet, patchVet, deleteVetById } from "../controllers/veterinarian.controller";
+import { validateCreateVeterinarian, validateUpdateVeterinarian } from "../middlewares/validatorVeterinarian.middlewares";
 
 const router = Router();
 
 router.get("/", getVets);
 router.get("/:id", getByIdVet);
-router.post("/", postVet);
-router.patch("/:id", patchVet);
-router.delete("/:id", deleteVet);
+router.post("/", validateCreateVeterinarian, postVet);
+router.patch("/:id", validateUpdateVeterinarian, patchVet);
+router.delete("/:id", deleteVetById);
 
 export default router;

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isValidUUID } from "../utils/uuid";
 import {
   fetchAllOwners,
   fetchByIdOwner,
@@ -82,6 +83,10 @@ export const getByIdOwner = async (req: Request, res: Response) => {
   try {
     const ownerId = req.params.id;
 
+    if (!isValidUUID(ownerId)) {
+      throw new ErrorException(400, "Invalid owner ID");
+    }
+
     const owner = await fetchByIdOwner(ownerId);
 
     res.status(200).json({
@@ -110,6 +115,10 @@ export const getByIdOwner = async (req: Request, res: Response) => {
 export const getOwnerByUserId = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
+
+    if (!isValidUUID(userId)) {
+      throw new ErrorException(400, "Invalid user ID");
+    }
 
     const owner = await fetchOwnerByUserId(userId);
 
@@ -141,6 +150,10 @@ export const patchOwner = async (req: Request, res: Response) => {
   try {
     const ownerId = req.params.id;
 
+    if (!isValidUUID(ownerId)) {
+      throw new ErrorException(400, "Invalid owner ID");
+    }
+
     const ownerData: UpdateOwnerDTO = req.body;
 
     const updatedOwner = await updateOwnerById(ownerId, ownerData);
@@ -170,6 +183,10 @@ export const patchOwner = async (req: Request, res: Response) => {
 export const deleteOwner = async (req: Request, res: Response) => {
   try {
     const ownerId = req.params.id;
+
+    if (!isValidUUID(ownerId)) {
+      throw new ErrorException(400, "Invalid owner ID");
+    }
 
     const owner = await fetchByIdOwner(ownerId);
 

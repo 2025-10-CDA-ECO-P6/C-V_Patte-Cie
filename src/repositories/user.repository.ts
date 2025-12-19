@@ -1,4 +1,6 @@
 import { PrismaClient, user_role } from "@prisma/client";
+import { randomUUID } from "crypto";
+
 const prisma = new PrismaClient();
 
 //create
@@ -9,7 +11,10 @@ export const createUser = async (userData: {
   createdAt: Date;
 }) => {
   return prisma.user.create({
-    data: userData
+    data: {
+      userId: randomUUID(),
+      ...userData,
+    },
   });
 };
 

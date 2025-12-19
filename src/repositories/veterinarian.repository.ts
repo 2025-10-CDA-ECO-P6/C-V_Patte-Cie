@@ -1,15 +1,19 @@
 import { PrismaClient } from "@prisma/client";
+import { randomUUID } from "crypto";
+
 const prisma = new PrismaClient();
 
 export const createVet = async (vetData: {
-  userId: number;
+  userId: string; // UUID
   name: string;
   phone: string;
-  address: string;
   createdAt: Date;
 }) => {
   return prisma.veterinarian.create({
-    data: vetData,
+    data: {
+      veterinarianId: randomUUID(),
+      ...vetData,
+    },
   });
 };
 
@@ -21,7 +25,7 @@ export const getAllVets = async (page: number = 1, pageSize: number = 25) => {
       skip,
       take: pageSize,
       select: {
-        vetId : true,
+        veterinarianId: true,
         userId: true,
         name: true,
         phone: true,
@@ -33,7 +37,6 @@ export const getAllVets = async (page: number = 1, pageSize: number = 25) => {
             userRole: true,
           },
         },
-        animals: true,
       },
     }),
     prisma.veterinarian.count(),
@@ -45,11 +48,11 @@ export const getAllVets = async (page: number = 1, pageSize: number = 25) => {
   };
 };
 
-export const getByIdVet = async (vetId: number) => {
+export const getByIdVet = async (veterinarianId: string) => {
   return prisma.veterinarian.findUnique({
-    where: { vetId },
+    where: { veterinarianId },
     select: {
-      vetId: true,
+      veterinarianId: true,
       userId: true,
       name: true,
       phone: true,
@@ -61,16 +64,15 @@ export const getByIdVet = async (vetId: number) => {
           userRole: true,
         },
       },
-      animals: true,
     },
   });
 };
 
-export const getVetByUserId = async (userId: number) => {
+export const getVetByUserId = async (userId: string) => {
   return prisma.veterinarian.findUnique({
     where: { userId },
     select: {
-      vetId: true,
+      veterinarianId: true,
       userId: true,
       name: true,
       phone: true,
@@ -82,26 +84,25 @@ export const getVetByUserId = async (userId: number) => {
           userRole: true,
         },
       },
-      animals: true,
     },
   });
 };
 
 export const updateVet = async (
-  vetId: number,
+  veterinarianId: string,
   data: {
     name?: string;
     phone?: string;
   }
 ) => {
   return prisma.veterinarian.update({
-    where: { vetId },
+    where: { veterinarianId },
     data: {
       ...data,
       updatedAt: new Date(),
     },
     select: {
-      vetId: true,
+      veterinarianId: true,
       userId: true,
       name: true,
       phone: true,
@@ -111,14 +112,8 @@ export const updateVet = async (
   });
 };
 
-export const deleteVet = async (vetId: number) => {
-  return prisma.$transaction(async (tx) => {
-    await tx.animal.deleteMany({
-      where: { vetId },
-    });
-
-    return tx.veterinarian.delete({
-      where: { vetId },
-    });
+export const deleteVet = async (veterinarianId: string) => {
+  return prisma.veterinarian.delete({
+    where: { veterinarianId },
   });
 };

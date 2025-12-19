@@ -1,36 +1,27 @@
-import * as vetRepo from "../repositories/owner.repository";
+import * as vetRepo from "../repositories/veterinarian.repository";
 import * as userRepo from "../repositories/user.repository";
-import { CreateVetDTO, UpdateVetDTO } from "../types/veterinarian.type";
+import { CreateVeterinarianDTO, UpdateVeterinarianDTO } from "../types/veterinarian.type";
 import "../types/errorException";
 
-export const createNewVet = async (vetData: CreateVetDTO) => {
+export const createNewVet = async (vetData: CreateVeterinarianDTO) => {
+  // Vérifier que l'utilisateur existe
   const user = await userRepo.getByIdUser(vetData.userId);
   if (!user) {
     throw new ErrorException(404, "User not found");
   }
 
+  // Vérifier que l'utilisateur a le bon rôle
   if (user.userRole !== "veterinarian") {
-    throw new ErrorException(400,"User role must be 'veterinarian'");
+    throw new ErrorException(400, "User role must be 'veterinarian'");
   }
 
+  // Vérifier qu'il n'existe pas déjà un profil vétérinaire pour cet utilisateur
   const existingVet = await vetRepo.getVetByUserId(vetData.userId);
   if (existingVet) {
     throw new ErrorException(409, "Veterinarian profile already exists for this user");
   }
 
-  if (!vetData.name || vetData.name.trim().length === 0) {
-    throw new ErrorException(400, "Name is required");
-  }
-
-  if (!vetData.phone || vetData.phone.trim().length === 0) {
-    throw new ErrorException(400, "Phone is required");
-  }
-
-  const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-  if (!phoneRegex.test(vetData.phone)) {
-    throw new ErrorException(400, "Invalid phone format");
-  }
-
+  // Les validations de format sont maintenant gérées par Joi
   const vet = await vetRepo.createVet({
     userId: vetData.userId,
     name: vetData.name,
@@ -50,7 +41,7 @@ export const fetchAllVets = async (page: number = 1, pageSize: number = 25) => {
   }
 };
 
-export const fetchByIdVet = async (vetId: number) => {
+export const fetchByIdVet = async (vetId: string) => {
   const vet = await vetRepo.getByIdVet(vetId);
 
   if (!vet) {
@@ -60,7 +51,7 @@ export const fetchByIdVet = async (vetId: number) => {
   return vet;
 };
 
-export const fetchVetByUserId = async (userId: number) => {
+export const fetchVetByUserId = async (userId: string) => {
   const vet = await vetRepo.getVetByUserId(userId);
 
   if (!vet) {
@@ -70,41 +61,19 @@ export const fetchVetByUserId = async (userId: number) => {
   return vet;
 };
 
-export const updateVetById = async (vetId: number, vetData: UpdateVetDTO) => {
+export const updateVetById = async (vetId: string, vetData: UpdateVeterinarianDTO) => {
   const existingVet = await vetRepo.getByIdVet(vetId);
   if (!existingVet) {
     throw new ErrorException(404, "Veterinarian not found");
   }
 
-  const updateData: {
-    name?: string;
-    phone?: string;
-  } = {};
-
-  if (vetData.name !== undefined) {
-    if (vetData.name.trim().length === 0) {
-      throw new ErrorException(400, "Name cannot be empty");
-    }
-    updateData.name = vetData.name;
-  }
-
-  if (vetData.phone !== undefined) {
-    if (vetData.phone.trim().length === 0) {
-      throw new ErrorException(400, "Phone cannot be empty");
-    }
-    const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-    if (!phoneRegex.test(vetData.phone)) {
-      throw new ErrorException(400, "Invalid phone format");
-    }
-    updateData.phone = vetData.phone;
-  }
-
-  const updatedVet = await vetRepo.updateVet(vetId, updateData);
+  // Les validations de format sont maintenant gérées par Joi
+  const updatedVet = await vetRepo.updateVet(vetId, vetData);
 
   return updatedVet;
 };
 
-export const deleteVetById = async (vetId: number) => {
+export const deleteVetById = async (vetId: string) => {
   const vet = await vetRepo.getByIdVet(vetId);
 
   if (!vet) {
