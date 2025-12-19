@@ -3,6 +3,7 @@ import { getVaccines,  getByIdVaccine, createVaccineController, updateVaccineCon
 import { validateCreateVaccine, validateUpdateVaccine } from "../middlewares/validatorVaccine.middlewares";
 const router = Router();
 
+
 router.get("/", getVaccines);
 router.get("/:id", getByIdVaccine);
 router.post("/", validateCreateVaccine, createVaccineController);
