@@ -1,5 +1,7 @@
+import { Prisma } from "@prisma/client";
+
 export interface CreateOwnerDTO {
-  userId: number;
+  userId: string;
   name: string;
   phone: string;
   address: string;
@@ -10,3 +12,10 @@ export interface UpdateOwnerDTO {
   phone?: string;
   address?: string;
 }
+
+export type OwnerWithRelations = Prisma.OwnerGetPayload<{
+  include: {
+    user: true;
+    animals: true;
+  };
+}>;

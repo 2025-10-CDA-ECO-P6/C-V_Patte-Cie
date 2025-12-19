@@ -80,11 +80,7 @@ export const getOwners = async (req: Request, res: Response) => {
 
 export const getByIdOwner = async (req: Request, res: Response) => {
   try {
-    const ownerId = Number.parseInt(req.params.id);
-
-    if (isNaN(ownerId)) {
-      throw new ErrorException(400, "Invalid owner ID");
-    }
+    const ownerId = req.params.id;
 
     const owner = await fetchByIdOwner(ownerId);
 
@@ -98,7 +94,6 @@ export const getByIdOwner = async (req: Request, res: Response) => {
           address: owner.address,
           createdAt: owner.createdAt,
           updatedAt: owner.updatedAt,
-          user: owner.user,
           animals: owner.animals,
         },
       },
@@ -114,11 +109,7 @@ export const getByIdOwner = async (req: Request, res: Response) => {
 
 export const getOwnerByUserId = async (req: Request, res: Response) => {
   try {
-    const userId = Number.parseInt(req.params.userId);
-
-    if (isNaN(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
+    const userId = req.params.userId;
 
     const owner = await fetchOwnerByUserId(userId);
 
@@ -148,11 +139,7 @@ export const getOwnerByUserId = async (req: Request, res: Response) => {
 
 export const patchOwner = async (req: Request, res: Response) => {
   try {
-    const ownerId = Number.parseInt(req.params.id);
-
-    if (isNaN(ownerId)) {
-      throw new ErrorException(400, "Invalid owner ID");
-    }
+    const ownerId = req.params.id;
 
     const ownerData: UpdateOwnerDTO = req.body;
 
@@ -182,11 +169,7 @@ export const patchOwner = async (req: Request, res: Response) => {
 
 export const deleteOwner = async (req: Request, res: Response) => {
   try {
-    const ownerId = Number.parseInt(req.params.id);
-
-    if (isNaN(ownerId)) {
-      throw new ErrorException(400, "Invalid owner ID");
-    }
+    const ownerId = req.params.id;
 
     const owner = await fetchByIdOwner(ownerId);
 

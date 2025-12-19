@@ -77,11 +77,7 @@ export const getUsers = async (req: Request, res: Response) => {
 //read by ID
 export const getByIdUser = async (req: Request, res: Response) => {
   try {
-    const userId = Number.parseInt(req.params.id);
-
-    if (isNaN(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
+    const userId = req.params.id;
 
     const user = await fetchByIdUser(userId);
 
@@ -131,11 +127,7 @@ export const postLogin = async (req: Request, res: Response) => {
 // update
 export const patchUser = async (req: Request, res: Response) => {
   try {
-    const userId = Number.parseInt(req.params.id);
-
-    if (isNaN(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
+    const userId = req.params.id;
 
     const userData: UpdateUserDTO = req.body;
 
@@ -165,11 +157,7 @@ export const patchUser = async (req: Request, res: Response) => {
 // delete
 export const deleteUser = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = Number.parseInt(req.params.id);
-
-    if (isNaN(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
+    const userId = req.params.id;
 
     // Récupérer l'utilisateur avant suppression pour le retourner (convention Strapi)
     const user = await fetchByIdUser(userId);

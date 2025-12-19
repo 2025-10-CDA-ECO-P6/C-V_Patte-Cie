@@ -56,7 +56,7 @@ export const fetchAllOwners = async (page: number = 1, pageSize: number = 25) =>
   }
 };
 
-export const fetchByIdOwner = async (ownerId: number) => {
+export const fetchByIdOwner = async (ownerId: string) => {
   const owner = await ownerRepo.getByIdOwner(ownerId);
 
   if (!owner) {
@@ -66,7 +66,7 @@ export const fetchByIdOwner = async (ownerId: number) => {
   return owner;
 };
 
-export const fetchOwnerByUserId = async (userId: number) => {
+export const fetchOwnerByUserId = async (userId: string) => {
   const owner = await ownerRepo.getOwnerByUserId(userId);
 
   if (!owner) {
@@ -76,7 +76,7 @@ export const fetchOwnerByUserId = async (userId: number) => {
   return owner;
 };
 
-export const updateOwnerById = async (ownerId: number, ownerData: UpdateOwnerDTO) => {
+export const updateOwnerById = async (ownerId: string, ownerData: UpdateOwnerDTO) => {
   const existingOwner = await ownerRepo.getByIdOwner(ownerId);
   if (!existingOwner) {
     throw new ErrorException(404, "Owner not found");
@@ -118,7 +118,7 @@ export const updateOwnerById = async (ownerId: number, ownerData: UpdateOwnerDTO
   return updatedOwner;
 };
 
-export const deleteOwnerById = async (ownerId: number) => {
+export const deleteOwnerById = async (ownerId: string) => {
   const owner = await ownerRepo.getByIdOwner(ownerId);
 
   if (!owner) {
