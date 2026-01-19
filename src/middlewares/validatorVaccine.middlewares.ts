@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Joi from "joi";
+import * as Joi from "joi";
 
 export const vaccineSchema = Joi.object({
   name: Joi.string()
