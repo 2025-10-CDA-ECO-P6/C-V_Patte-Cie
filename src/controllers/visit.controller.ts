@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isValidUUID } from "../utils/uuid";
 import { fetchAllVisits, fetchByIdVisit, createVisit, updateVisit, deleteVisit } from "../services/visit.service";
 import { VisitInput, VisitUpdateInput, VisitStatus, VisitWithRelations } from "../types";
 import { fetchByIdAnimal } from "../services/animal.service";
@@ -51,6 +52,10 @@ export const getByIdVisit = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
 
+    if (!isValidUUID(visitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
     const visit = await fetchByIdVisit(visitId);
     res.status(200).json(visit);
   } catch (error) {
@@ -77,7 +82,7 @@ export const createVisitController = async (req: Request, res: Response) => {
     }
 
     // Vérifier que le vétérinaire existe -> quand crud sera fait
-    // const vet = await fetchByIdVeterinarian(Number(veterinarianId));
+    // const vet = await fetchByIdVeterinarian(veterinarianId);
     // if (!vet) {
     //   return res.status(404).json({ message: `Veterinarian with id ${veterinarianId} not found` });
     // }
@@ -115,6 +120,10 @@ export const createVisitController = async (req: Request, res: Response) => {
 export const updateVisitController = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
+
+    if (Number.isNaN(visitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
     const existingVisit = await fetchByIdVisit(visitId);
     if (!existingVisit) {
@@ -158,6 +167,10 @@ export const updateVisitController = async (req: Request, res: Response) => {
 export const deleteVisitController = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
+
+    if (Number.isNaN(visitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
     await deleteVisit(visitId);
     res.status(204).send();

@@ -9,7 +9,7 @@ export interface Animal {
   breed: string;
   dateOfBirth: Date;
   picture: string | null;
-  weight: Prisma.Decimal;  
+  weight: Prisma.Decimal;
   gender: Gender;
   ownerId: string;
   createdAt: Date | null;
@@ -29,8 +29,8 @@ export interface AnimalInput {
   species: string;
   breed: string;
   dateOfBirth: Date;
-  picture?: string | null ;
-  weight: number | string | Prisma.Decimal; 
+  picture?: string | null;
+  weight: number | string | Prisma.Decimal;
   gender: Gender;
   ownerId: string;
 }

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isValidUUID } from "../utils/uuid";
 import {
   fetchAllAnimals,
   fetchByIdAnimal,
@@ -59,6 +60,10 @@ export const getAnimals = async (req: Request, res: Response) => {
 export const getByIdAnimalController = async (req: Request, res: Response) => {
   try {
     const animalId = req.params.id;
+
+    if (!isValidUUID(animalId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
     const animal = await fetchByIdAnimal(animalId);
 
@@ -141,7 +146,7 @@ export const updateAnimalController = async (req: Request, res: Response) => {
   try {
     const animalId = req.params.id;
 
-    if (Number.isNaN(animalId)) {
+    if (!isValidUUID(animalId)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
 
@@ -187,6 +192,10 @@ export const updateAnimalController = async (req: Request, res: Response) => {
 export const deleteAnimalController = async (req: Request, res: Response) => {
   try {
     const animalId = req.params.id;
+
+    if (!isValidUUID(animalId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
     await deleteAnimal(animalId);
     res.status(204).send();

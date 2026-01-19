@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { randomUUID } from "crypto";
 import { AnimalInput, AnimalUpdateInput } from "../types";
 
 const prisma = new PrismaClient();
@@ -42,6 +43,7 @@ export const getByIdAnimal = async (animalId: string) => {
 export const createAnimal = async (data: AnimalInput) => {
   return prisma.animal.create({
     data: {
+      animalId: randomUUID(),
       name: data.name,
       species: data.species,
       breed: data.breed,

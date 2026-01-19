@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAnimal = exports.updateAnimal = exports.createAnimal = exports.getByIdAnimal = exports.getAllAnimals = void 0;
 const client_1 = require("@prisma/client");
+const crypto_1 = require("crypto");
 const prisma = new client_1.PrismaClient();
 const getAllAnimals = async (page, pageSize) => {
     const skip = (page - 1) * pageSize;
@@ -40,6 +41,7 @@ exports.getByIdAnimal = getByIdAnimal;
 const createAnimal = async (data) => {
     return prisma.animal.create({
         data: {
+            animalId: (0, crypto_1.randomUUID)(),
             name: data.name,
             species: data.species,
             breed: data.breed,

@@ -9,7 +9,7 @@ export interface Visit {
   visitStatus: VisitStatus;
   observation: string | null;
   animalId: string;
-  veterinarianId: number;
+  veterinarianId: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -21,7 +21,7 @@ export type VisitWithRelations = Prisma.VisitGetPayload<{
   };
 }>;
 
-// Creat
+// Create
 export interface VisitInput {
   date: Date;
   reason: string;
