@@ -1,5 +1,5 @@
 # Utilise Node 20
-FROM node:20
+FROM node:20-alpine
 
 # Définit le dossier de travail dans le conteneur
 WORKDIR /app

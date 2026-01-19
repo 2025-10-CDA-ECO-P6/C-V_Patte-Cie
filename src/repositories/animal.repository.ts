@@ -26,7 +26,7 @@ export const getAllAnimals = async (page: number, pageSize: number) => {
     prisma.animal.count(),
   ]);
 
-  return { animals, total };
+  return { animals, total }; 
 };
 
 export const getByIdAnimal = async (animalId: string) => {
