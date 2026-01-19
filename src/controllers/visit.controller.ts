@@ -116,6 +116,7 @@ export const createVisitController = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const updateVisitController = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
