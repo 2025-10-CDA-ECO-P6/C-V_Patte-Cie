@@ -6,13 +6,15 @@ import {
   updateAnimalController, 
   deleteAnimalController 
 } from "../controllers/animal.controller";
+import { authorizeRoles, authenticateToken } from "../middlewares/auth.middleware";
+import { validateCreateAnimal, validateUpdateAnimal } from "../middlewares/validatorAnimal.middlewares";
 
 const router = Router();
 
 router.get("/", getAnimals);
 router.get("/:id", getByIdAnimalController);
-router.post("/", createAnimalController);
-router.put("/:id", updateAnimalController);
-router.delete("/:id", deleteAnimalController);
+router.post("/", authenticateToken, authorizeRoles("veterinarian"), validateCreateAnimal, createAnimalController);
+router.put("/:id", authenticateToken, authorizeRoles("veterinarian"),validateUpdateAnimal, updateAnimalController);
+router.delete("/:id", authenticateToken, authorizeRoles("veterinarian"), deleteAnimalController);
 
 export default router;

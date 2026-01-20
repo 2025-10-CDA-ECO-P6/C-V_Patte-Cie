@@ -7,12 +7,14 @@ import {
   deleteVisitController 
 } from "../controllers/visit.controller";
 
+import { authorizeRoles, authenticateToken } from "../middlewares/auth.middleware";
+
 const router = Router();
 
 router.get("/", getVisits);
 router.get("/:id", getByIdVisit);
-router.post("/", createVisitController);
-router.put("/:id", updateVisitController);
-router.delete("/:id", deleteVisitController);
+router.post("/", authenticateToken, authorizeRoles("veterinarian"),createVisitController);
+router.put("/:id", authenticateToken, authorizeRoles("veterinarian"), updateVisitController);
+router.delete("/:id", authenticateToken, authorizeRoles("veterinarian"), deleteVisitController);
 
 export default router;
