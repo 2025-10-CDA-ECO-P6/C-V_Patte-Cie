@@ -130,6 +130,11 @@ JWT_SECRET="votre_clé_générée_ici"
 
 **Important**: Ne partagez jamais cette clé et ne la commitez jamais dans Git. Ne changez pas cette valeur en production car cela invaliderait tous les tokens existants.
 
+## Repo Forké : 
+
+https://github.com/Victoria-31/petcareTheo
+https://github.com/Victoria-31/Louis-Patte-and-cie
+
 ## 👥 Équipe
 
 - [Charlène SCOMPARIN] - [@ChSPN](https://github.com/ChSPN)

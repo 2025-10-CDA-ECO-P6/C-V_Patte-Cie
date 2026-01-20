@@ -1,8 +1,13 @@
 import express from "express";
 import routes from "./routes";
-import "./types/errorException"; // Import pour rendre ErrorException disponible globalement
 
 const app = express();
+
+import cors from "cors";
+
+if (process.env.CLIENT_URL != null) {
+  app.use(cors({ origin: [process.env.CLIENT_URL] }));
+}
 
 app.use(express.json());
 app.use("/api", routes);
