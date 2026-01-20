@@ -269,14 +269,14 @@ Content-Type: application/json
 ```json
 {
   "name": "Max",
-  "species": "Chien",
-  "breed": "Labrador",
-  "dateOfBirth": "2020-05-15",
-  "weight": 25.5,
+  "species": "Dog",
+  "dateOfBirth": "2020-05-15T00:00:00.000Z",
+  "picture": "https://example.com/images/max.jpg",
+  "weight": "25.5",
   "gender": "M",
-  "ownerId": 1,
-  "picture": "https://example.com/images/max.jpg"
+  "ownerId": "f4c5d1f9-d42b-4da8-9c58-d6b121c1c8b2"
 }
+
 ```
 
 **Champs requis**: `name`, `species`, `breed`, `dateOfBirth`, `weight`, `gender`, `ownerId`

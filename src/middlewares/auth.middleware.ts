@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/jwt.utils';
+import { Request, Response, NextFunction } from "express";
+import { verifyToken } from "../utils/jwt.utils";
 
 export interface AuthRequest extends Request {
   user?: {
@@ -15,29 +15,43 @@ export const authenticateToken = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-      return res.status(401).json({ message: 'Access token required' });
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    const [scheme, token] = authHeader.split(" ");
+
+    if (scheme !== "Bearer" || !token) {
+      return res.status(401).json({ message: "Invalid authorization format" });
     }
 
     const decoded = verifyToken(token);
-    req.user = decoded;
+
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      userRole: decoded.userRole,
+    };
+
     next();
   } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
+
 
 export const authorizeRoles = (...allowedRoles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ message: 'Authentication required' });
+      return res.status(401).json({ message: "Authentication required" });
     }
 
     if (!allowedRoles.includes(req.user.userRole)) {
-      return res.status(403).json({ message: 'Access forbidden: insufficient permissions' });
+      return res
+        .status(403)
+        .json({ message: "Access forbidden: insufficient permissions" });
     }
 
     next();
