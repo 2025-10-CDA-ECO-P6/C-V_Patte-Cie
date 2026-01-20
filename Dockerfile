@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose le port
-EXPOSE 3000
+EXPOSE 3010
 
 # Expose la variable d'environnement au build pour Prisma
 ARG DATABASE_URL
