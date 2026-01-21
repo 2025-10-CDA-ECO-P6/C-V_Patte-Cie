@@ -63,6 +63,8 @@ async function main() {
       species: "Dog",
       breed: "Golden Retriever",
       dateOfBirth: new Date("2020-01-01"),
+      picture:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiLocYfqBzFGIPjzET9GpzVgjmKnjyIsk4i0kCNIbzTgKVECMIDo6OswFfZYmJHNyesZOU7LcJ0g4tOuCcSRlSjL6GPIaI9rIckFUrZBHr_w&s=10",
       weight: 25,
       gender: "M",
       ownerId: userOwner1.owner.ownerId,
@@ -74,6 +76,8 @@ async function main() {
       name: "Milo",
       species: "Cat",
       breed: "Siamese",
+      picture:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9_odLu6RW3OpJwQupnWEvFceFW6bgv7N_V3tLwz8oKNhqR25CxwZRdB4tM9all6skWvMOH7qwAqffllLvyaB3zBAn84YivAigVjp9PGhdHw&s=10",
       dateOfBirth: new Date("2021-03-10"),
       weight: 5,
       gender: "M",
@@ -87,6 +91,8 @@ async function main() {
       species: "Dog",
       breed: "Labrador",
       dateOfBirth: new Date("2019-07-22"),
+      picture:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAbCH85-XTGMTpYRXNJ5ncQF7qjZ6sfK733_-uN0Gy8lO3HQ8F47X3xXBJGobW24Nsg_e1NYvoIFPRuCe1020oVA5kDERYZbzPpR7m9iPESQ&s=10",
       weight: 28,
       gender: "F",
       ownerId: userOwner1.owner.ownerId,
