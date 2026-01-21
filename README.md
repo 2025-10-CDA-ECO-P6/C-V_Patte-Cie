@@ -89,51 +89,10 @@ npx prisma db seed
 
 ### Explorer la base
 ```bash
-# Interface graphique Prisma Studio
-npx prisma studio
-
-# Ou via psql
-psql $DATABASE_URL
+npx prisma studio  # interface graphique
+psql $DATABASE_URL # via psql
 ```
 
-## 📜 Scripts
-```bash
-npx prisma studio    # Interface graphique DB
-npm run dev          # Lancer le serveur en watch
-```
-
-## 🔐 Configuration JWT
-
-### Générer un JWT_SECRET
-
-Pour sécuriser l'authentification, vous devez générer une clé secrète forte pour le JWT_SECRET dans votre fichier `.env`.
-
-**Méthode 1 : Node.js (recommandé)**
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-**Méthode 2 : OpenSSL**
-```bash
-openssl rand -hex 64
-```
-
-**Méthode 3 : Terminal Linux/Mac**
-```bash
-head /dev/urandom | tr -dc A-Za-z0-9 | head -c 64
-```
-
-Copiez le résultat généré et ajoutez-le dans votre fichier `.env`:
-```bash
-JWT_SECRET="votre_clé_générée_ici"
-```
-
-**Important**: Ne partagez jamais cette clé et ne la commitez jamais dans Git. Ne changez pas cette valeur en production car cela invaliderait tous les tokens existants.
-
-## Repo Forké : 
-
-https://github.com/Victoria-31/petcareTheo
-https://github.com/Victoria-31/Louis-Patte-and-cie
 
 ## 👥 Équipe
 
@@ -141,3 +100,9 @@ https://github.com/Victoria-31/Louis-Patte-and-cie
 - [Victoria Fonteny] - [@github-username](https://github.com/Victoria-31)
 
 ---
+
+
+## Repos liés : 
+
+https://github.com/Victoria-31/petcareTheo
+https://github.com/Victoria-31/Louis-Patte-and-cie #n'a pas pu être lié
