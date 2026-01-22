@@ -11,8 +11,8 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3010/api",
-        description: "Serveur local",
+        url: "https://pattes-and-cie.onrender.com/api",
+        description: "deployment server",
       },
     ],
   },
