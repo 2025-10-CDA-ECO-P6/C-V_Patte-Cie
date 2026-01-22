@@ -2,6 +2,7 @@ import * as ownerRepo from "../repositories/owner.repository";
 import * as userRepo from "../repositories/user.repository";
 import { CreateOwnerDTO, UpdateOwnerDTO } from "../types/owner.types";
 import ErrorException from "../types/errorException";
+import { UserRole } from "@prisma/client";
 
 export const createNewOwner = async (ownerData: CreateOwnerDTO) => {
   const user = await userRepo.getByIdUser(ownerData.userId);
@@ -10,8 +11,9 @@ export const createNewOwner = async (ownerData: CreateOwnerDTO) => {
     throw new ErrorException(404, "User not found");
   }
 
-  if (user.userRole !== "owner") {
-    throw new ErrorException(400,"User role must be 'owner'");
+  // ✅ Utilisation de l'enum UserRole
+  if (user.userRole !== UserRole.owner) {
+    throw new ErrorException(400, "User role must be 'owner'");
   }
 
   const existingOwner = await ownerRepo.getOwnerByUserId(ownerData.userId);

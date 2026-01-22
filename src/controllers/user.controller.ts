@@ -1,18 +1,23 @@
 import { Request, Response } from "express";
-import { fetchAllUsers, fetchByIdUser, createNewUser, loginUser, updateUserById, deleteUserById } from "../services/user.service";
-import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import ErrorException from "../types/errorException";
 import { isValidUUID } from "../utils/uuid";
+import {
+  fetchAllUsers,
+  fetchByIdUser,
+  createNewUser,
+  loginUser,
+  updateUserById,
+  deleteUserById,
+} from "../services/user.service";
+import { CreateUserDTO, UpdateUserDTO, UserWithRelations } from "../types/user.types";
 
-
-// create
+// CREATE
 export const postUser = async (req: Request, res: Response) => {
   try {
     const userData: CreateUserDTO = req.body;
     const newUser = await createNewUser(userData);
 
-    // Format de réponse Strapi
     res.status(201).json({
       data: {
         id: newUser.userId,
@@ -25,28 +30,20 @@ export const postUser = async (req: Request, res: Response) => {
       },
     });
   } catch (err: any) {
-    if (err instanceof ErrorException) {
-      return res.status(err.status).json({ message: err.message });
-    }
-
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
   }
 };
 
-// read
+// READ ALL
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    // Récupérer les paramètres de pagination (convention Strapi)
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 25;
 
     const { data: users, total } = await fetchAllUsers(page, pageSize);
 
-    // Format de réponse Strapi avec pagination
-    const pageCount = Math.ceil(total / pageSize);
-
     res.status(200).json({
-      data: users.map(user => ({
+      data: users.map((user: UserWithRelations) => ({
         id: user.userId,
         attributes: {
           email: user.email,
@@ -61,123 +58,23 @@ export const getUsers = async (req: Request, res: Response) => {
         pagination: {
           page,
           pageSize,
-          pageCount,
+          pageCount: Math.ceil(total / pageSize),
           total,
         },
       },
     });
   } catch (err: any) {
-    if (err instanceof ErrorException) {
-      return res.status(err.status).json({ message: err.message });
-    }
-
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
   }
 };
 
-//read by ID
+// READ BY ID
 export const getByIdUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
-
-    if (!isValidUUID(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
+    if (!isValidUUID(userId)) throw new ErrorException(400, "Invalid user ID");
 
     const user = await fetchByIdUser(userId);
-
-    // Format de réponse Strapi
-    res.status(200).json({
-      data: {
-        id: user.userId,
-        attributes: {
-          email: user.email,
-          userRole: user.userRole,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      },
-    });
-  } catch (err: any) {
-    if (err instanceof ErrorException) {
-      return res.status(err.status).json({ message: err.message });
-    }
-
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
-
-// login
-export const postLogin = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw new ErrorException(400, "Email and password are required");
-    }
-
-    const token = await loginUser(email, password);
-    res.status(200).json({
-      accessToken: token
-    });
-  } catch (err: any) {
-    if (err instanceof ErrorException) {
-      return res.status(err.status).json({ message: err.message });
-    }
-
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
-
-// update
-export const patchUser = async (req: Request, res: Response) => {
-  try {
-    const userId = req.params.id;
-
-    if (!isValidUUID(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
-
-    const userData: UpdateUserDTO = req.body;
-
-    // Appel du service pour mettre à jour l'utilisateur
-    const updatedUser = await updateUserById(userId, userData);
-
-    // Format de réponse Strapi
-    res.status(200).json({
-      data: {
-        id: updatedUser.userId,
-        attributes: {
-          email: updatedUser.email,
-          createdAt: updatedUser.createdAt,
-          updatedAt: updatedUser.updatedAt
-        },
-      },
-    });
-  } catch (err: any) {
-    if (err instanceof ErrorException) {
-      return res.status(err.status).json({ message: err.message });
-    }
-
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
-
-// delete
-export const deleteUser = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.params.id;
-
-    if (!isValidUUID(userId)) {
-      throw new ErrorException(400, "Invalid user ID");
-    }
-
-    // Récupérer l'utilisateur avant suppression pour le retourner (convention Strapi)
-    const user = await fetchByIdUser(userId);
-
-    await deleteUserById(userId);
-
-    // Retourner 200 OK avec le corps de la ressource supprimée (convention Strapi)
     res.status(200).json({
       data: {
         id: user.userId,
@@ -192,10 +89,59 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
       },
     });
   } catch (err: any) {
-    if (err instanceof ErrorException) {
-      return res.status(err.status).json({ message: err.message });
-    }
+    res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
+  }
+};
 
-    res.status(500).json({ message: "Erreur serveur" });
+// LOGIN
+export const postLogin = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) throw new ErrorException(400, "Email and password required");
+
+    const token = await loginUser(email, password);
+    res.status(200).json({ accessToken: token });
+  } catch (err: any) {
+    res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
+  }
+};
+
+// UPDATE
+export const patchUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    if (!isValidUUID(userId)) throw new ErrorException(400, "Invalid user ID");
+
+    const userData: UpdateUserDTO = req.body;
+    const updatedUser = await updateUserById(userId, userData);
+
+    res.status(200).json({
+      data: {
+        id: updatedUser.userId,
+        attributes: {
+          email: updatedUser.email,
+          userRole: updatedUser.userRole,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
+          owner: updatedUser.owner,
+          veterinarian: updatedUser.veterinarian,
+        },
+      },
+    });
+  } catch (err: any) {
+    res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
+  }
+};
+
+// DELETE
+export const deleteUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.params.id;
+    if (!isValidUUID(userId)) throw new ErrorException(400, "Invalid user ID");
+
+    await deleteUserById(userId);
+    res.status(200).json({ message: "User successfully deleted" });
+  } catch (err: any) {
+    res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
   }
 };

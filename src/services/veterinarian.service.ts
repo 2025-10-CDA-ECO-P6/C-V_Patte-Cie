@@ -1,86 +1,76 @@
 import * as vetRepo from "../repositories/veterinarian.repository";
 import * as userRepo from "../repositories/user.repository";
-import { CreateVeterinarianDTO, UpdateVeterinarianDTO } from "../types/veterinarian.type";
+import { UserRole } from "@prisma/client";
+
+import {
+  CreateVeterinarianDTO,
+  UpdateVeterinarianDTO,
+  PaginatedVets,
+  VeterinarianWithRelations,
+} from "../types/veterinarian.type";
 import ErrorException from "../types/errorException";
 
+// CREATE
 export const createNewVet = async (vetData: CreateVeterinarianDTO) => {
-  // Vérifier que l'utilisateur existe
   const user = await userRepo.getByIdUser(vetData.userId);
-  if (!user) {
-    throw new ErrorException(404, "User not found");
-  }
+  if (!user) throw new ErrorException(404, "User not found");
+  if (user.userRole !== "veterinarian") throw new ErrorException(400, "User role must be 'veterinarian'");
 
-  // Vérifier que l'utilisateur a le bon rôle
-  if (user.userRole !== "veterinarian") {
-    throw new ErrorException(400, "User role must be 'veterinarian'");
-  }
-
-  // Vérifier qu'il n'existe pas déjà un profil vétérinaire pour cet utilisateur
   const existingVet = await vetRepo.getVetByUserId(vetData.userId);
-  if (existingVet) {
-    throw new ErrorException(409, "Veterinarian profile already exists for this user");
-  }
+  if (existingVet) throw new ErrorException(409, "Veterinarian profile already exists for this user");
 
-  // Les validations de format sont maintenant gérées par Joi
-  const vet = await vetRepo.createVet({
+  // Créer le vétérinaire
+  const createdVet = await vetRepo.createVet({
     userId: vetData.userId,
     name: vetData.name,
     phone: vetData.phone,
     createdAt: new Date(),
   });
 
-  return vet;
+  // Recharger avec 'user' complet
+  const vetWithUser = await vetRepo.getByIdVet(createdVet.veterinarianId);
+  return vetWithUser!;
 };
 
-export const fetchAllVets = async (page: number = 1, pageSize: number = 25) => {
-  try {
-    const result = await vetRepo.getAllVets(page, pageSize);
-    return result;
-  } catch (error) {
-    throw new ErrorException(500, "Error fetching veterinarians: " + (error as Error).message);
-  }
+
+// READ ALL
+export const fetchAllVets = async (page = 1, pageSize = 25): Promise<PaginatedVets> => {
+  const result = await vetRepo.getAllVets(page, pageSize);
+  return result;
 };
 
-export const fetchByIdVet = async (vetId: string) => {
+// READ BY ID
+export const fetchByIdVet = async (vetId: string): Promise<VeterinarianWithRelations> => {
   const vet = await vetRepo.getByIdVet(vetId);
-
-  if (!vet) {
-    throw new ErrorException(404, "Veterinarian not found");
-  }
-
+  if (!vet) throw new ErrorException(404, "Veterinarian not found");
   return vet;
 };
 
-export const fetchVetByUserId = async (userId: string) => {
+// READ BY USER ID
+export const fetchVetByUserId = async (userId: string): Promise<VeterinarianWithRelations> => {
   const vet = await vetRepo.getVetByUserId(userId);
-
-  if (!vet) {
-    throw new ErrorException(404, "Veterinarian not found for this user");
-  }
-
+  if (!vet) throw new ErrorException(404, "Veterinarian not found for this user");
   return vet;
 };
 
+// UPDATE
 export const updateVetById = async (vetId: string, vetData: UpdateVeterinarianDTO) => {
   const existingVet = await vetRepo.getByIdVet(vetId);
-  if (!existingVet) {
-    throw new ErrorException(404, "Veterinarian not found");
-  }
+  if (!existingVet) throw new ErrorException(404, "Veterinarian not found");
 
-  // Les validations de format sont maintenant gérées par Joi
-  const updatedVet = await vetRepo.updateVet(vetId, vetData);
+  await vetRepo.updateVet(vetId, vetData);
 
-  return updatedVet;
+  // Recharger avec 'user' complet
+  const updatedVet = await vetRepo.getByIdVet(vetId);
+  return updatedVet!;
 };
 
+
+// DELETE
 export const deleteVetById = async (vetId: string) => {
   const vet = await vetRepo.getByIdVet(vetId);
-
-  if (!vet) {
-    throw new ErrorException(404, "Veterinarian not found");
-  }
+  if (!vet) throw new ErrorException(404, "Veterinarian not found");
 
   await vetRepo.deleteVet(vetId);
-
   return { message: "Veterinarian successfully deleted" };
 };

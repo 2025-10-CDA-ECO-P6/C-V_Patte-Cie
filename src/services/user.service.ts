@@ -1,49 +1,23 @@
 import * as userRepo from "../repositories/user.repository";
-import { CreateUserDTO, UpdateUserDTO } from "../types/user.types";
+import { CreateUserDTO, PaginatedUsers, UpdateUserDTO, UserWithRelations } from "../types/user.types";
+import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt.utils";
-import bcrypt from 'bcrypt';
 import ErrorException from "../types/errorException";
 
-// login
-export const loginUser = async (email: string, password: string) => {
-  const user = await userRepo.getUserByEmail(email);
-
-  if (!user) {
-    throw new ErrorException(401, "Invalid credentials");
-  }
-
-  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
-  if (!isPasswordValid) {
-    throw new ErrorException(401, "Invalid credentials");
-  }
-
-  return generateToken({
-    userId: user.userId,
-    email: user.email,
-    userRole: user.userRole,
-  });
-};
-
-// create
+// CREATE
 export const createNewUser = async (userData: CreateUserDTO) => {
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  if (!emailRegex.test(userData.email)) {
+  if (!/^[\w.-]+@[\w.-]+\.\w{2,}$/.test(userData.email)) {
     throw new ErrorException(400, "Invalid email format");
   }
 
   if (!userData.password || userData.password.length < 8) {
-    throw new ErrorException(400, "Password must be at least 8 characters long");
+    throw new ErrorException(400, "Password must be at least 8 characters");
   }
 
   const existingUser = await userRepo.getUserByEmail(userData.email);
-  if (existingUser) {
-    throw new ErrorException(409, "Email already exists");
-  }
+  if (existingUser) throw new ErrorException(409, "Email already exists");
 
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
 
   const user = await userRepo.createUser({
     email: userData.email,
@@ -56,78 +30,62 @@ export const createNewUser = async (userData: CreateUserDTO) => {
   return userWithoutPassword;
 };
 
-// read
-export const fetchAllUsers = async (page: number = 1, pageSize: number = 25) => {
-  try {
-    const result = await userRepo.getAllUsers(page, pageSize);
-    return result;
-  } catch (error) {
-    throw new ErrorException(500, "Error fetching users: " + (error as Error).message);
-  }
+// LOGIN
+export const loginUser = async (email: string, password: string) => {
+  const user = await userRepo.getUserByEmail(email);
+  if (!user) throw new ErrorException(401, "Invalid credentials");
+
+  const isValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isValid) throw new ErrorException(401, "Invalid credentials");
+
+  return generateToken({ userId: user.userId, email: user.email, userRole: user.userRole });
 };
-// read by ID
-export const fetchByIdUser = async (userId: string) => {
+
+// READ ALL (pagination)
+export const fetchAllUsers = async (page = 1, pageSize = 25): Promise<PaginatedUsers> => {
+  const users = await userRepo.getAllUsers(page, pageSize);
+  const total = await userRepo.countUsers();
+  return { data: users, total };
+};
+
+// READ BY ID
+export const fetchByIdUser = async (userId: string): Promise<UserWithRelations> => {
   const user = await userRepo.getByIdUser(userId);
-
-  if (!user) {
-    throw new ErrorException(404, "User not found");
-  }
-
+  if (!user) throw new ErrorException(404, "User not found");
   return user;
 };
 
-
-// update
+// UPDATE
 export const updateUserById = async (userId: string, userData: UpdateUserDTO) => {
   const existingUser = await userRepo.getByIdUser(userId);
-  if (!existingUser) {
-    throw new ErrorException(404, "User not found");
-  }
+  if (!existingUser) throw new ErrorException(404, "User not found");
 
-  const updateData: {
-    email?: string;
-    passwordHash?: string;
-  } = {};
+  const updateData: { email?: string; passwordHash?: string } = {};
 
-  if (userData.email !== undefined) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(userData.email)) {
+  if (userData.email) {
+    if (!/^[\w.-]+@[\w.-]+\.\w{2,}$/.test(userData.email)) {
       throw new ErrorException(400, "Invalid email format");
     }
-
     const emailExists = await userRepo.getUserByEmail(userData.email);
     if (emailExists && emailExists.userId !== userId) {
       throw new ErrorException(409, "Email already exists");
     }
-
     updateData.email = userData.email;
   }
 
-  if (userData.password && userData.password.trim() !== "") {
-    if (userData.password.length < 8) {
-      throw new ErrorException(400, "Password must be at least 8 characters long");
-    }
-
-    // Hashing du nouveau mot de passe
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-    updateData.passwordHash = hashedPassword;
+  if (userData.password) {
+    if (userData.password.length < 8) throw new ErrorException(400, "Password too short");
+    updateData.passwordHash = await bcrypt.hash(userData.password, 10);
   }
 
-  const updatedUser = await userRepo.updateUser(userId, updateData);
-
-  return updatedUser;
+  return userRepo.updateUser(userId, updateData);
 };
 
-// delete
+// DELETE
 export const deleteUserById = async (userId: string) => {
   const user = await userRepo.getByIdUser(userId);
-
-  if (!user) {
-    throw new ErrorException(404, "User not found");
-  }
+  if (!user) throw new ErrorException(404, "User not found");
 
   await userRepo.deleteUser(userId);
-
   return { message: "User successfully deleted" };
 };

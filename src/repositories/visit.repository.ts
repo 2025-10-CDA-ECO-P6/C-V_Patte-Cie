@@ -1,4 +1,4 @@
-import { PrismaClient, visit_status } from "@prisma/client";
+import { PrismaClient, VisitStatus } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { VisitInput, VisitUpdateInput } from "../types";
 
@@ -25,7 +25,6 @@ export const getAllVisits = async (page: number, pageSize: number) => {
   return { visits, total };
 };
 
-
 export const getByIdVisit = async (visitId: string) => {
   return prisma.visit.findUnique({
     where: { visitId },
@@ -42,7 +41,7 @@ export const createVisit = async (data: VisitInput) => {
       visitId: randomUUID(),
       date: data.date,
       reason: data.reason,
-      visitStatus: data.visitStatus as visit_status,
+      visitStatus: data.visitStatus as VisitStatus,
       observation: data.observation ?? null,
       animal: {
         connect: { animalId: data.animalId },

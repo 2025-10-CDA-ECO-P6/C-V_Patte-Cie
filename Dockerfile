@@ -3,15 +3,15 @@ FROM node:20-alpine
 
 # Dossier de travail
 WORKDIR /app
-
-# Copie des fichiers de dépendances
 COPY package*.json ./
-
-# Installation des dépendances
 RUN npm install
 
-# Copie du reste du projet
+# Copier le reste du projet
 COPY . .
+
+
+# COPY prisma ./prisma
+# RUN npx prisma generate
 
 # Build si tu utilises TypeScript
 RUN npm run build

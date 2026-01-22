@@ -11,7 +11,7 @@ model User {
   userId       String        @id @default(uuid()) @map("user_id") @db.Uuid
   email        String        @unique @db.VarChar(100)
   passwordHash String        @map("password_hash") @db.VarChar(255)
-  userRole     user_role     @map("user_role")
+  userRole     UserRole      @map("user_role")
   createdAt    DateTime?     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt    DateTime?     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   owner        Owner?
@@ -74,7 +74,7 @@ model Visit {
   visitId        String       @id @default(uuid()) @map("visit_id") @db.Uuid
   date           DateTime     @db.Timestamp(6)
   reason         String
-  visitStatus    visit_status @map("visit_status")
+  visitStatus    VisitStatus  @map("visit_status")
   observation    String?
   animalId       String       @map("animal_id") @db.Uuid
   veterinarianId String       @map("veterinarian_id") @db.Uuid
@@ -86,7 +86,6 @@ model Visit {
   @@index([animalId], map: "idx_visit_animal")
   @@index([veterinarianId], map: "idx_visit_veterinarian")
   @@index([date(sort: Desc)], map: "idx_visit_date")
-  @@index([visitStatus], map: "idx_visit_status")
   @@map("visit")
 }
 
@@ -94,7 +93,7 @@ model Vaccine {
   vaccineId          String        @id @default(uuid()) @map("vaccine_id") @db.Uuid
   name               String        @db.VarChar(100)
   administrationDate DateTime?     @map("administration_date") @db.Date
-  vaccineStatus      vaccine_status @map("vaccine_status")
+  vaccineStatus      VaccineStatus @map("vaccine_status")
   reminderDelays     Int[]         @map("reminder_delays")
   veterinarianId     String?       @map("veterinarian_id") @db.Uuid
   animalId           String?       @map("animal_id") @db.Uuid
@@ -105,7 +104,6 @@ model Vaccine {
 
   @@index([animalId], map: "idx_vaccine_animal")
   @@index([veterinarianId], map: "idx_vaccine_veterinarian")
-  @@index([vaccineStatus], map: "idx_vaccine_status")
   @@map("vaccine")
 }
 
@@ -125,22 +123,4 @@ enum VaccineStatus {
   pending
   administered
   expired
-}
-
-enum user_role {
-  owner
-  veterinarian
-  admin
-}
-
-enum vaccine_status {
-  pending
-  administered
-  expired
-}
-
-enum visit_status {
-  scheduled
-  completed
-  cancelled
 }

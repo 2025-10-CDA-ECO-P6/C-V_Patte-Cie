@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 const prisma = new PrismaClient();
 
@@ -118,13 +118,10 @@ export const updateOwner = async (
 };
 
 export const deleteOwner = async (ownerId: string) => {
-  return prisma.$transaction(async (tx) => {
-    await tx.animal.deleteMany({
-      where: { ownerId },
-    });
 
-    return tx.owner.delete({
-      where: { ownerId },
-    });
-  });
+return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  await tx.animal.deleteMany({ where: { ownerId } });
+  return tx.owner.delete({ where: { ownerId } });
+});
+
 };
