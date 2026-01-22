@@ -1,10 +1,13 @@
-import { PrismaClient, VisitStatus } from "@prisma/client";
+import { PrismaClient, VisitStatus, Visit } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { VisitInput, VisitUpdateInput } from "../types";
+import { VisitInput, VisitUpdateInput, VisitWithRelations } from "../types";
 
 const prisma = new PrismaClient();
 
-export const getAllVisits = async (page: number, pageSize: number) => {
+export const getAllVisits = async (
+  page: number,
+  pageSize: number
+): Promise<{ visits: VisitWithRelations[]; total: number }> => {
   const skip = (page - 1) * pageSize;
 
   const [visits, total] = await prisma.$transaction([
@@ -15,9 +18,7 @@ export const getAllVisits = async (page: number, pageSize: number) => {
         animal: true,
         veterinarian: true,
       },
-      orderBy: {
-        date: "desc",
-      },
+      orderBy: { date: "desc" },
     }),
     prisma.visit.count(),
   ]);
@@ -25,7 +26,9 @@ export const getAllVisits = async (page: number, pageSize: number) => {
   return { visits, total };
 };
 
-export const getByIdVisit = async (visitId: string) => {
+export const getByIdVisit = async (
+  visitId: string
+): Promise<VisitWithRelations | null> => {
   return prisma.visit.findUnique({
     where: { visitId },
     include: {
@@ -35,7 +38,9 @@ export const getByIdVisit = async (visitId: string) => {
   });
 };
 
-export const createVisit = async (data: VisitInput) => {
+export const createVisit = async (
+  data: VisitInput
+): Promise<VisitWithRelations> => {
   return prisma.visit.create({
     data: {
       visitId: randomUUID(),
@@ -43,12 +48,8 @@ export const createVisit = async (data: VisitInput) => {
       reason: data.reason,
       visitStatus: data.visitStatus as VisitStatus,
       observation: data.observation ?? null,
-      animal: {
-        connect: { animalId: data.animalId },
-      },
-      veterinarian: {
-        connect: { veterinarianId: data.veterinarianId },
-      },
+      animal: { connect: { animalId: data.animalId } },
+      veterinarian: { connect: { veterinarianId: data.veterinarianId } },
     },
     include: {
       animal: true,
@@ -60,19 +61,15 @@ export const createVisit = async (data: VisitInput) => {
 export const updateVisit = async (
   visitId: string,
   data: VisitUpdateInput
-) => {
+): Promise<VisitWithRelations> => {
   const { animalId, veterinarianId, ...otherData } = data;
 
   return prisma.visit.update({
     where: { visitId },
     data: {
       ...otherData,
-      ...(animalId !== undefined && {
-        animal: { connect: { animalId } },
-      }),
-      ...(veterinarianId !== undefined && {
-        veterinarian: { connect: { veterinarianId } },
-      }),
+      ...(animalId && { animal: { connect: { animalId } } }),
+      ...(veterinarianId && { veterinarian: { connect: { veterinarianId } } }),
     },
     include: {
       animal: true,
@@ -81,10 +78,9 @@ export const updateVisit = async (
   });
 };
 
-export const deleteVisit = async (visitId: string) => {
-  return prisma.visit.delete({
-    where: { visitId },
-  });
+
+export const deleteVisit = async (visitId: string): Promise<void> => {
+  await prisma.visit.delete({ where: { visitId } });
 };
 
 export default prisma;

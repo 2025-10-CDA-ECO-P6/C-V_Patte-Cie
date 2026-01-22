@@ -1,5 +1,7 @@
 .env
 node_modules/
+# !node_modules/@prisma/client
+
 /generated/prisma
 dist/
 .claude/

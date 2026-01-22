@@ -1,16 +1,22 @@
 import * as visitRepo from "../repositories/visit.repository";
-import { VisitInput, VisitUpdateInput } from "../types";
+import { VisitInput, VisitUpdateInput, VisitWithRelations } from "../types";
 
 
-export const fetchAllVisits = async ( page: number, pageSize: number) => {
+export const fetchAllVisits = async (
+  page: number,
+  pageSize: number
+): Promise<{ visits: VisitWithRelations[]; total: number }> => {
   try {
     return await visitRepo.getAllVisits(page, pageSize);
   } catch (error) {
-    throw new Error("Error fetching visits");
+    throw new Error("Error fetching visits: " + (error as Error).message);
   }
 };
 
-export const fetchByIdVisit = async (visitId: string) => {
+
+export const fetchByIdVisit = async (
+  visitId: string
+): Promise<VisitWithRelations> => {
   const visit = await visitRepo.getByIdVisit(visitId);
 
   if (!visit) {
@@ -20,7 +26,10 @@ export const fetchByIdVisit = async (visitId: string) => {
   return visit;
 };
 
-export const createVisit = async (data: VisitInput) => {
+
+export const createVisit = async (
+  data: VisitInput
+): Promise<VisitWithRelations> => {
   try {
     return await visitRepo.createVisit(data);
   } catch (error) {
@@ -30,10 +39,11 @@ export const createVisit = async (data: VisitInput) => {
   }
 };
 
+
 export const updateVisit = async (
   visitId: string,
   data: VisitUpdateInput
-) => {
+): Promise<VisitWithRelations> => {
   try {
     return await visitRepo.updateVisit(visitId, data);
   } catch (error) {
@@ -43,9 +53,10 @@ export const updateVisit = async (
   }
 };
 
-export const deleteVisit = async (visitId: string) => {
+
+export const deleteVisit = async (visitId: string): Promise<void> => {
   try {
-    return await visitRepo.deleteVisit(visitId);
+    await visitRepo.deleteVisit(visitId);
   } catch (error) {
     throw new Error(
       "Error deleting the visit: " + (error as Error).message

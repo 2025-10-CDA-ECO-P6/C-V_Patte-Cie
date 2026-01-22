@@ -11,7 +11,6 @@ export const createNewOwner = async (ownerData: CreateOwnerDTO) => {
     throw new ErrorException(404, "User not found");
   }
 
-  // ✅ Utilisation de l'enum UserRole
   if (user.userRole !== UserRole.owner) {
     throw new ErrorException(400, "User role must be 'owner'");
   }

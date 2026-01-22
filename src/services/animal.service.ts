@@ -31,7 +31,14 @@ export const createAnimal = async (data: AnimalInput): Promise<AnimalWithRelatio
 
 export const updateAnimal = async (animalId: string, data: AnimalUpdateInput) => {
   try {
-    return await animalRepo.updateAnimal(animalId, data);
+    const updateData = { ...data };
+
+    // Si on met à jour le poids
+    if (data.weight !== undefined) {
+      updateData.weight = new Prisma.Decimal(data.weight);
+    }
+
+    return await animalRepo.updateAnimal(animalId, updateData);
   } catch (error) {
     throw new Error("Error updating the animal: " + (error as Error).message);
   }

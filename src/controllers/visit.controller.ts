@@ -1,9 +1,19 @@
 import { Request, Response } from "express";
 import { isValidUUID } from "../utils/uuid";
-import { fetchAllVisits, fetchByIdVisit, createVisit, updateVisit, deleteVisit } from "../services/visit.service";
-import { VisitInput, VisitUpdateInput, VisitStatus, VisitWithRelations } from "../types";
+import {
+  fetchAllVisits,
+  fetchByIdVisit,
+  createVisit,
+  updateVisit,
+  deleteVisit,
+} from "../services/visit.service";
+import { VisitInput, VisitUpdateInput, VisitWithRelations } from "../types";
+import { VisitStatus } from "@prisma/client";
 import { fetchByIdAnimal } from "../services/animal.service";
 
+/**
+ * Helper pour formater la réponse d'une visite
+ */
 const formatVisitResponse = (visit: VisitWithRelations) => ({
   id: visit.visitId,
   attributes: {
@@ -18,6 +28,9 @@ const formatVisitResponse = (visit: VisitWithRelations) => ({
   },
 });
 
+/**
+ * GET /visits?page=1&pageSize=10
+ */
 export const getVisits = async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -28,27 +41,22 @@ export const getVisits = async (req: Request, res: Response) => {
     }
 
     const { visits, total } = await fetchAllVisits(page, pageSize);
-
     const pageCount = Math.ceil(total / pageSize);
 
     res.status(200).json({
       data: visits.map(formatVisitResponse),
-      meta: {
-        pagination: {
-          page,
-          pageSize,
-          pageCount,
-          total,
-        },
-      },
+      meta: { pagination: { page, pageSize, pageCount, total } },
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-export const getByIdVisit = async (req: Request, res: Response) => {
+/**
+ * GET /visits/:id
+ */
+export const getVisitByIdController = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
 
@@ -57,23 +65,31 @@ export const getByIdVisit = async (req: Request, res: Response) => {
     }
 
     const visit = await fetchByIdVisit(visitId);
-    res.status(200).json(visit);
-  } catch (error) {
-    if ((error as Error).message === "Visit not found") {
+    if (!visit) {
       return res.status(404).json({ message: "Visit not found" });
     }
 
+    res.status(200).json(formatVisitResponse(visit));
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+/**
+ * POST /visits
+ */
 export const createVisitController = async (req: Request, res: Response) => {
   try {
-    const { date, reason, visitStatus, observation, animalId, veterinarianId } = req.body;
+    const { date, reason, visitStatus, observation, animalId, veterinarianId } =
+      req.body;
 
     if (!date || !reason || !visitStatus || !animalId || !veterinarianId) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (!isValidUUID(animalId) || !isValidUUID(veterinarianId)) {
+      return res.status(400).json({ message: "Invalid UUID for animal or veterinarian" });
     }
 
     const animal = await fetchByIdAnimal(animalId);
@@ -81,47 +97,32 @@ export const createVisitController = async (req: Request, res: Response) => {
       return res.status(404).json({ message: `Animal with id ${animalId} not found` });
     }
 
-    // Vérifier que le vétérinaire existe -> quand crud sera fait
-    // const vet = await fetchByIdVeterinarian(veterinarianId);
-    // if (!vet) {
-    //   return res.status(404).json({ message: `Veterinarian with id ${veterinarianId} not found` });
-    // }
-
     const visitData: VisitInput = {
       date: new Date(date),
       reason,
-      visitStatus,
+      visitStatus: visitStatus as VisitStatus,
       observation: observation ?? null,
-      animalId: animalId,
-      veterinarianId: veterinarianId,
+      animalId,
+      veterinarianId,
     };
 
     const visit = await createVisit(visitData);
 
-    res.status(201).json({
-      data: {
-        id: visit.visitId,
-        attributes: {
-          date: visit.date,
-          reason: visit.reason,
-          visitStatus: visit.visitStatus,
-          observation: visit.observation,
-          animalId: visit.animalId,
-          veterinarianId: visit.veterinarianId,
-        },
-      },
-    });
+    res.status(201).json(formatVisitResponse(visit));
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+/**
+ * PATCH /visits/:id
+ */
 export const updateVisitController = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
 
-    if (Number.isNaN(visitId)) {
+    if (!isValidUUID(visitId)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
 
@@ -130,45 +131,39 @@ export const updateVisitController = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Visit not found" });
     }
 
-    const {
-      date,
-      reason,
-      visitStatus,
-      observation,
-      animalId,
-      veterinarianId,
-    } = req.body;
+    const { date, reason, visitStatus, observation, animalId, veterinarianId } =
+      req.body;
 
     const visitData: VisitUpdateInput = {
       ...(date && { date: new Date(date) }),
       ...(reason && { reason }),
       ...(visitStatus && { visitStatus: visitStatus as VisitStatus }),
       ...(observation !== undefined && { observation }),
-      ...(animalId && { animalId: animalId }),
-      ...(veterinarianId && { veterinarianId: veterinarianId }),
+      ...(animalId && isValidUUID(animalId) && { animalId }),
+      ...(veterinarianId && isValidUUID(veterinarianId) && { veterinarianId }),
     };
 
     const updatedVisit = await updateVisit(visitId, visitData);
-
-    res.status(200).json(updatedVisit);
+    res.status(200).json(formatVisitResponse(updatedVisit));
   } catch (error) {
     console.error(error);
 
     if ((error as Error).message.includes("Foreign key constraint")) {
-      return res
-        .status(400)
-        .json({ message: "Invalid animalId or veterinarianId" });
+      return res.status(400).json({ message: "Invalid animalId or veterinarianId" });
     }
 
     res.status(500).json({ message: "Server error" });
   }
 };
 
+/**
+ * DELETE /visits/:id
+ */
 export const deleteVisitController = async (req: Request, res: Response) => {
   try {
     const visitId = req.params.id;
 
-    if (Number.isNaN(visitId)) {
+    if (!isValidUUID(visitId)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
 

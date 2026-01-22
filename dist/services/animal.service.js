@@ -64,7 +64,12 @@ const createAnimal = async (data) => {
 exports.createAnimal = createAnimal;
 const updateAnimal = async (animalId, data) => {
     try {
-        return await animalRepo.updateAnimal(animalId, data);
+        const updateData = { ...data };
+        // Si on met à jour le poids
+        if (data.weight !== undefined) {
+            updateData.weight = new client_1.Prisma.Decimal(data.weight);
+        }
+        return await animalRepo.updateAnimal(animalId, updateData);
     }
     catch (error) {
         throw new Error("Error updating the animal: " + error.message);

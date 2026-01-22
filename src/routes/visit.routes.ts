@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { 
   getVisits, 
-  getByIdVisit, 
+  getVisitByIdController, 
   createVisitController, 
   updateVisitController, 
   deleteVisitController 
@@ -48,7 +48,7 @@ router.get("/", getVisits);
  *       404:
  *         description: Visite non trouvée
  */
-router.get("/:id", getByIdVisit);
+router.get("/:id", getVisitByIdController);
 
 /**
  * @swagger
