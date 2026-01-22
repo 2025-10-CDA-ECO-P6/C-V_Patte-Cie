@@ -102,10 +102,18 @@ psql $DATABASE_URL # via psql
 ---
 
 
-## Repos liés : 
+## 🔗 Repos liés
 
-https://github.com/Victoria-31/petcareTheo #n'a pas pu être lié
-https://github.com/Victoria-31/Louis-Patte-and-cie 
+- **Back-end (non lié)**  
+  https://github.com/Victoria-31/petcareTheo  
+  _⚠️ Ce dépôt n’a pas pu être lié_
+
+- **Front-end**  
+  https://github.com/Victoria-31/Louis-Patte-and-cie  
+
+  - 📄 **Documentation de la connexion front / back** :  
+    https://github.com/Victoria-31/Louis-Patte-and-cie/blob/main/README-Link-Back.md
+
 
 ## 🚀 Déploiement
 
