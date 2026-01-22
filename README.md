@@ -9,29 +9,36 @@ Backend pour la gestion d'un carnet de santé vétérinaire numérique.
 - Express.js
 - PostgreSQL (Neon.tech)
 - Prisma ORM
+- Docker
 
 ## 📦 Installation
 ```bash
 # Cloner le projet
-git clone https://github.com/votre-team/patte-et-cie-backend.git
-cd patte-et-cie-backend
+git clone git@github.com:2025-10-CDA-ECO-P6/C-V_Patte-Cie.git
+cd C-V_Patte-Cie
 
 # Installer les dépendances
 npm install
 
 # Configurer l'environnement
-cp .env.example .env
+cp .env.sample .env
 # Éditer .env avec vos valeurs
-```
 
-## ⚙️ Configuration
-
-Créez un fichier `.env` :
-```env
-DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
-PORT=3000
-NODE_ENV=development
+# Générer une clé secrète JWT sécurisée
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+# Copier le résultat dans .env comme valeur de JWT_SECRET
 ```
+## Lancer le serveur
+
+# Première fois : build + lancement
+docker compose up --build
+
+# Pour un redémarrage rapide sans rebuild
+docker compose up
+
+# Lancer le serveur TypeScript en mode watch
+npm run dev
+
 
 ## 📁 Structure du projet
 ```
@@ -48,8 +55,10 @@ patte-et-cie-backend/
 │   ├── controllers/
 │   ├── services/
 │   └── repositories/
+├── dist/                   # Build TypeScript (ignored)
+├── node_modules/           # Ignoré
 └── .env
-│   └── prisma.config.ts
+    prisma.config.ts
 ```
 
 ## 🗄️ Base de données
@@ -64,30 +73,36 @@ La base PostgreSQL (Neon.tech) comprend :
 - `visit` - Visites vétérinaires
 - `vaccine` - Vaccinations
 
-### Réinitialiser la base
+
+### Réinitialiser et synchroniser la base
+> ⚠️ **Attention :** cette opération supprime toutes les données existantes.
+
 ```bash
-# Synchroniser Prisma
-npx prisma db pull
+# Réinitialiser la base de données de développement
+npx prisma migrate reset
+
+# Synchroniser le client Prisma
 npx prisma generate
-```
+
+# Remplir la base avec des données de test
+npx prisma db seed
 
 ### Explorer la base
 ```bash
-# Interface graphique Prisma Studio
-npx prisma studio
-
-# Ou via psql
-psql $DATABASE_URL
+npx prisma studio  # interface graphique
+psql $DATABASE_URL # via psql
 ```
 
-## 📜 Scripts
-```bash
-npx prisma studio    # Interface graphique DB
-```
 
 ## 👥 Équipe
 
 - [Charlène SCOMPARIN] - [@ChSPN](https://github.com/ChSPN)
-- [Nom Binôme] - [@github-username](https://github.com/username)
+- [Victoria Fonteny] - [@github-username](https://github.com/Victoria-31)
 
 ---
+
+
+## Repos liés : 
+
+https://github.com/Victoria-31/petcareTheo
+https://github.com/Victoria-31/Louis-Patte-and-cie #n'a pas pu être lié
