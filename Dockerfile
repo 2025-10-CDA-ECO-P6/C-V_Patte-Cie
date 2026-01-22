@@ -1,27 +1,26 @@
-# Utilise Node 20
+# Image Node.js 20
 FROM node:20-alpine
 
-# Définit le dossier de travail dans le conteneur
+# Dossier de travail
 WORKDIR /app
 
-# Copie package.json + package-lock.json
+# Copie des fichiers de dépendances
 COPY package*.json ./
 
-# Installe les dépendances
+# Installation des dépendances
 RUN npm install
 
-# Copie tout le projet
+# Copie du reste du projet
 COPY . .
 
-# Expose le port
-EXPOSE 3010
-
-# Expose la variable d'environnement au build pour Prisma
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
-# Génère Prisma client
+# Génération du client Prisma
 RUN npx prisma generate
 
-# Commande pour lancer le serveur
-CMD ["npm", "run", "dev"]
+# Build si tu utilises TypeScript
+RUN npm run build
+
+# Port exposé (Render : process.env.PORT)
+EXPOSE 3010
+
+# Lancement du serveur en production
+CMD ["npm", "start"]
