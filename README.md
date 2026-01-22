@@ -102,7 +102,28 @@ psql $DATABASE_URL # via psql
 ---
 
 
-## Repos liés : 
+## 🔗 Repos liés
 
-https://github.com/Victoria-31/petcareTheo
-https://github.com/Victoria-31/Louis-Patte-and-cie #n'a pas pu être lié
+- **Back-end (non lié)**  
+  https://github.com/Victoria-31/petcareTheo  
+  _⚠️ Ce dépôt n’a pas pu être lié_
+
+- **Front-end**  
+  https://github.com/Victoria-31/Louis-Patte-and-cie  
+
+  - 📄 **Documentation de la connexion front / back** :  
+    https://github.com/Victoria-31/Louis-Patte-and-cie/blob/main/README-Link-Back.md
+
+
+## 🚀 Déploiement
+
+### Front-end
+- **Application (Vercel)** :  
+  https://louis-patte-and-cie.vercel.app
+
+### Back-end
+- **API** :  
+  https://pattes-and-cie.onrender.com/api/animals
+
+- **Documentation API (Swagger)** :  
+  https://pattes-and-cie.onrender.com/api-docs/
