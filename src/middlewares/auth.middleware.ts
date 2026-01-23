@@ -15,16 +15,10 @@ export const authenticateToken = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.auth;
 
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-
-    const [scheme, token] = authHeader.split(" ");
-
-    if (scheme !== "Bearer" || !token) {
-      return res.status(401).json({ message: "Invalid authorization format" });
+    if (!token) {
+      return res.status(401).json({ message: "Token missing" });
     }
 
     const decoded = verifyToken(token);
