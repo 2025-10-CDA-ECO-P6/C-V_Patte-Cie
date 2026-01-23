@@ -104,9 +104,9 @@ psql $DATABASE_URL # via psql
 
 ## 🔗 Repos liés
 
-- **Back-end (non lié)**  
+- **Front-end (non lié)**  
   https://github.com/Victoria-31/petcareTheo  
-  _⚠️ Ce dépôt n’a pas pu être lié_
+  _⚠️ Ce dépôt n’a pas pu être lié. Initialement prévu pour être géré à deux, je me suis finalement retrouvée seule sur le projet. N’ayant pas réussi, dans un premier temps, à accéder au frontend de ce dépôt, j’ai choisi de me concentrer en priorité sur le second repository._
 
 - **Front-end**  
   https://github.com/Victoria-31/Louis-Patte-and-cie  
