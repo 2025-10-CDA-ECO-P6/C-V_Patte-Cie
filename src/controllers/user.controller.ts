@@ -99,8 +99,15 @@ export const postLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!email || !password) throw new ErrorException(400, "Email and password required");
 
-    const token = await loginUser(email, password);
-    res.status(200).json({ accessToken: token });
+    const { token, role } = await loginUser(email, password);
+    res.cookie("auth", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24, // 1 jour
+    });
+
+    res.status(200).json({ role, message: "Utilisateur connecté" });
   } catch (err: any) {
     res.status(err instanceof ErrorException ? err.status : 500).json({ message: err.message });
   }

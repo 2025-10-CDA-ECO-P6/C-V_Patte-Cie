@@ -42,8 +42,15 @@ export const loginUser = async (email: string, password: string) => {
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) throw new ErrorException(401, "Invalid credentials");
 
-  return generateToken({ userId: user.userId, email: user.email, userRole: user.userRole });
+  const token = generateToken({
+    userId: user.userId,
+    email: user.email,
+    userRole: user.userRole,
+  });
+
+  return { token, role: user.userRole };
 };
+
 
 // READ ALL (pagination)
 export const fetchAllUsers = async (page = 1, pageSize = 25): Promise<PaginatedUsers> => {
