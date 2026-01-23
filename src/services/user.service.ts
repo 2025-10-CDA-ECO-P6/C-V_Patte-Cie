@@ -14,6 +14,10 @@ export const createNewUser = async (userData: CreateUserDTO) => {
     throw new ErrorException(400, "Password must be at least 8 characters");
   }
 
+   if (!userData.userRole || !["owner", "veterinarian", "admin"].includes(userData.userRole)) {
+    throw new ErrorException(400, "Invalid user role, must be 'owner', 'veterinarian' or 'admin'");
+  }
+
   const existingUser = await userRepo.getUserByEmail(userData.email);
   if (existingUser) throw new ErrorException(409, "Email already exists");
 
