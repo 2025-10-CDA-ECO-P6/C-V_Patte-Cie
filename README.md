@@ -127,3 +127,14 @@ psql $DATABASE_URL # via psql
 
 - **Documentation API (Swagger)** :  
   https://pattes-and-cie.onrender.com/api-docs/
+
+
+---
+
+## Axes d'amélioration
+
+- Adapter les endpoints existants pour :
+    - Retourner tous les animaux si l’utilisateur connecté est vétérinaire.
+    - Retourner uniquement les animaux liés au compte si l’utilisateur est propriétaire.
+
+- ajouter des dashboard sur le front en fonction vet ou owner
